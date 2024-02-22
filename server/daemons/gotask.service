@@ -1,0 +1,23 @@
+[Unit]
+Description=Go task demo service
+After=network.target
+StartLimitIntervalSec=0
+
+[Install]
+WantedBy=multi-user.target
+
+[Service]
+Environment="SERVER_ENVIRONMENT=dev"
+Environment="USE_ENVVAR=true" 
+Environment="DB_HOST=localhost"
+Environment="DB_NAME=task"
+Environment="DB_CONNECTIONS=10"
+Environment="DB_PORT=5432"
+Environment="DB_TIMEZONE=Europe/London"
+Environment="DB_USERNAME=postgres"
+Environment="DB_PASSWORD=postgres"
+Environment="SERVER_HOST=0.0.0.0"
+Environment="SERVER_PORT=8080"
+ExecStart=/home/bob/work/task/bin/task-amd64-linux
+Restart=always
+RestartSec=1

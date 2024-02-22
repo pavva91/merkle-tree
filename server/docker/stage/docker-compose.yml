@@ -1,0 +1,23 @@
+services:
+  goserver:
+    build: .
+    container_name: go-server-stage
+    environment:
+      - SERVER_ENVIRONMENT=${SERVER_ENVIRONMENT}
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+  db:
+    env_file: .env
+    container_name: db-stage
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=task
+    image: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./data/db:/var/lib/postgres/data
+version: "3.8"

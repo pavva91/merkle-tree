@@ -1,0 +1,16 @@
+services:
+  db:
+    build: .
+    env_file: .env
+    container_name: zama-dev-db
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=task
+    image: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./data/db:/var/lib/postgres/data
+version: "3.8"
+
