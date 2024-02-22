@@ -15,6 +15,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
+const DOWNLOAD_FOLDER = "./downloads"
+
 // getCmd represents the get command
 var getCmd = &cobra.Command{
 	Use:   "get",
@@ -42,9 +44,22 @@ var getCmd = &cobra.Command{
 		defer response.Body.Close()
 
 		if response.StatusCode == 200 {
+			err := os.RemoveAll(DOWNLOAD_FOLDER)
+			if err != nil {
+				fmt.Println(err)
+				return
+			}
+
+			err = os.MkdirAll(DOWNLOAD_FOLDER, os.ModePerm)
+			if err != nil {
+				fmt.Println(err)
+				return
+			}
+
 			// Create the file
-			// out, err := os.Create(gopherName + ".png")
-			out, err := os.Create(fileName)
+			out, err := os.Create(fmt.Sprintf("%s/%s", DOWNLOAD_FOLDER, fileName))
+
+			// out, err := os.Create(fileName)
 			if err != nil {
 				fmt.Println(err)
 			}
@@ -56,7 +71,7 @@ var getCmd = &cobra.Command{
 				fmt.Println(err)
 			}
 
-			fmt.Println("Perfect! Just saved in " + out.Name() + "!")
+			fmt.Printf("Perfect! Just saved in %s/%s!\n", DOWNLOAD_FOLDER, fileName)
 
 			// Get Merkle Proof
 			mp := response.Header.Get("Merkle-Proof")
@@ -67,8 +82,7 @@ var getCmd = &cobra.Command{
 			log.Println(merkleProofs[2])
 
 			// TODO: Verify merkle-proof with file hash and root hash
-
-			f, err := os.Open(fileName)
+			f, err := os.Open(DOWNLOAD_FOLDER + "/" + fileName)
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -79,11 +93,11 @@ var getCmd = &cobra.Command{
 				log.Fatal(err)
 			}
 
-			// fmt.Printf("hash file: %x", h.Sum(nil))
-			hash := fmt.Sprintf("hash file: %x", h.Sum(nil))
+			// fmt.Printf("hashFile file: %x", h.Sum(nil))
+			hashFile := fmt.Sprintf("hash file: %x\n", h.Sum(nil))
 			// TODO: Verify file with merkle tree (library)
 			// merkleTree.Verify(hash, mp, rootHash)
-			fmt.Println(hash)
+			fmt.Println(hashFile)
 
 		} else {
 			fmt.Println("Error: " + fileName + " not exists! :-(")
