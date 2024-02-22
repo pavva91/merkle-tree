@@ -17,9 +17,8 @@ func NewRouter() {
 
 func initializeRoutes() {
 	files := Router.PathPrefix("/files").Subrouter()
-	files.HandleFunc("", handlers.FilesHandler.UploadBulkFiles).Methods("POST")
-	files.HandleFunc("/", handlers.FilesHandler.UploadBulkFiles).Methods("POST")
-	// file := Router.PathPrefix("/file").Subrouter()
-	// file.HandleFunc("", handlers.FilesHandler.UploadFileOnLocalStorage).Methods("POST")
-	// file.HandleFunc("/", handlers.FilesHandler.UploadFileOnLocalStorage).Methods("POST")
+	files.HandleFunc("", handlers.FilesHandler.BulkUpload).Methods("POST")
+	files.HandleFunc("/", handlers.FilesHandler.BulkUpload).Methods("POST")
+	files.HandleFunc("/{file:[a-z0-9]+}", handlers.FilesHandler.DownloadByName).Methods("GET")
+
 }
