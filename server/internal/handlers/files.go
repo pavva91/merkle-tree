@@ -11,7 +11,7 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
-	"github.com/pavva91/task-third-party/internal/errorhandlers"
+	"github.com/pavva91/merkle-tree/server/internal/errorhandlers"
 )
 
 type filesHandler struct{}
@@ -20,7 +20,9 @@ var (
 	FilesHandler = filesHandler{}
 )
 
+// TODO: Use configs (file and envvars)
 const MAX_UPLOAD_SIZE = 2 * 1024 * 1024 // 2MB
+const UPLOAD_FOLDER = "./uploads"
 
 func (h filesHandler) BulkUpload(w http.ResponseWriter, r *http.Request) {
 	// 32 MB is the default used by FormFile()
@@ -33,13 +35,13 @@ func (h filesHandler) BulkUpload(w http.ResponseWriter, r *http.Request) {
 	// They are accessible only after ParseMultipartForm is called
 	files := r.MultipartForm.File["file"]
 
-	err := os.RemoveAll("./uploads")
+	err := os.RemoveAll(UPLOAD_FOLDER)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	err = os.MkdirAll("./uploads", os.ModePerm)
+	err = os.MkdirAll(UPLOAD_FOLDER, os.ModePerm)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -90,8 +92,8 @@ func (h filesHandler) BulkUpload(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
-		// TODO: Create Merkle Tree
 	}
+	// TODO: Create Merkle Tree (get files from local storage)
 
 	fmt.Fprintf(w, "Upload successful")
 }
@@ -100,10 +102,9 @@ func (h filesHandler) DownloadByName(w http.ResponseWriter, r *http.Request) {
 	fileName := mux.Vars(r)["filename"]
 	log.Println(fileName)
 
-	dirname := "./uploads"
 	filename := fileName
 
-	dir, err := os.Open(dirname)
+	dir, err := os.Open(UPLOAD_FOLDER)
 	if err != nil {
 		fmt.Println("Error opening directory:", err)
 		return
@@ -116,7 +117,7 @@ func (h filesHandler) DownloadByName(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	foundFilePath := dirname + "/"
+	foundFilePath := UPLOAD_FOLDER + "/"
 
 	for _, file := range files {
 		ss := strings.SplitAfter(file.Name(), "_")
@@ -129,7 +130,6 @@ func (h filesHandler) DownloadByName(w http.ResponseWriter, r *http.Request) {
 	arr := []string{"foo", "bar", "baz"}
 	mp := fmt.Sprintf("%+q", arr)
 	// NOTE: To reconstruct string[] from mp:
-	// result1 := mp[1 : len(mp)-2]
 	result1 := strings.Replace(mp, "[", "", -1)
 	result2 := strings.Replace(result1, "]", "", -1)
 	result3 := strings.Replace(result2, "\"", "", -1)

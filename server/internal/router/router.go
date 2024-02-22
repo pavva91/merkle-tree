@@ -2,7 +2,7 @@ package router
 
 import (
 	"github.com/gorilla/mux"
-	"github.com/pavva91/task-third-party/internal/handlers"
+	"github.com/pavva91/merkle-tree/server/internal/handlers"
 )
 
 var (

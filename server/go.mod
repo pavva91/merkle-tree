@@ -1,4 +1,4 @@
-module github.com/pavva91/task-third-party
+module github.com/pavva91/merkle-tree/server
 
 go 1.21.6
 

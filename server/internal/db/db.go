@@ -2,7 +2,7 @@ package db
 
 import (
 	"fmt"
-	"github.com/pavva91/task-third-party/config"
+	"github.com/pavva91/merkle-tree/server/config"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
