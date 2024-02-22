@@ -1,6 +1,6 @@
 # Client
 
-Will be a CLI app (https://dev.to/aurelievache/learning-go-by-examples-part-3-create-a-cli-app-in-go-1h43)[https://dev.to/aurelievache/learning-go-by-examples-part-3-create-a-cli-app-in-go-1h43]
+Will be a CLI app [https://dev.to/aurelievache/learning-go-by-examples-part-3-create-a-cli-app-in-go-1h43](https://dev.to/aurelievache/learning-go-by-examples-part-3-create-a-cli-app-in-go-1h43)
 with these functionalities:
 
 - Bulk upload files:

@@ -1,8 +1,11 @@
-module github.com/merkle-tree/client
+module github.com/pavva91/merkle-tree/client
 
 go 1.22.0
 
-require github.com/spf13/cobra v1.8.0
+require (
+	github.com/pavva91/merkle-tree/libs/merkletree v0.0.0
+	github.com/spf13/cobra v1.8.0
+)
 
 require (
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
@@ -22,3 +25,5 @@ require (
 	gopkg.in/ini.v1 v1.62.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 )
+
+replace github.com/pavva91/merkle-tree/libs/merkletree v0.0.0 => ../libs/merkletree

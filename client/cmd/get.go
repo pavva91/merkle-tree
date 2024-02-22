@@ -12,6 +12,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/pavva91/merkle-tree/libs/merkletree"
 	"github.com/spf13/cobra"
 )
 
@@ -31,6 +32,8 @@ var getCmd = &cobra.Command{
 		} else {
 			// TODO: Return error and stop execution
 		}
+
+		merkletree.Hello("Valer")
 
 		URL := "http://localhost:8080/files/" + fileName
 
