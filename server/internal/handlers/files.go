@@ -79,7 +79,8 @@ func (h filesHandler) BulkUpload(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		// TODO: add client identifier (to handle multiple clients)
-		f, err := os.Create(fmt.Sprintf("./uploads/%d_%d_%s", k+1, time.Now().UnixNano(), fileHeader.Filename))
+		f, err := os.Create(fmt.Sprintf("%s/%d_%d_%s", UPLOAD_FOLDER, k+1, time.Now().UnixNano(), fileHeader.Filename))
+		// f, err := os.Create(fmt.Sprintf("./uploads/%d_%d_%s", k+1, time.Now().UnixNano(), fileHeader.Filename))
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
@@ -127,17 +128,9 @@ func (h filesHandler) DownloadByName(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	// TODO: Calculate merkle proof (library)
 	arr := []string{"foo", "bar", "baz"}
 	mp := fmt.Sprintf("%+q", arr)
-	// NOTE: To reconstruct string[] from mp:
-	result1 := strings.Replace(mp, "[", "", -1)
-	result2 := strings.Replace(result1, "]", "", -1)
-	result3 := strings.Replace(result2, "\"", "", -1)
-	result := strings.SplitAfter(result3, " ")
-	log.Println(result[0])
-	log.Println(result[1])
-	log.Println(result[2])
-
 	w.Header().Add("Merkle-Proof", mp)
 
 	// fileBytes, err := os.ReadFile("./uploads/3_1708595975295766854_f3")
