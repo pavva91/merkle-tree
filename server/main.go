@@ -89,7 +89,7 @@ func main() {
 	// connect to db
 	db.ORM.MustConnectToDB(config.ServerConfigValues)
 	err := db.ORM.GetDB().AutoMigrate(
-		// &models.File{},
+	// &models.File{},
 	)
 	if err != nil {
 		log.Panicln("error retrieving DB")
