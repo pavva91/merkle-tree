@@ -33,7 +33,7 @@ var getCmd = &cobra.Command{
 			// TODO: Return error and stop execution
 		}
 
-		merkletree.Hello("Valer")
+		fmt.Println(merkletree.Hello("Valer"))
 
 		URL := "http://localhost:8080/files/" + fileName
 

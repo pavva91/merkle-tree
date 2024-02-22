@@ -15,6 +15,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
+const STORAGE_FOLDER = "./storage"
+
 // uploadCmd represents the upload command
 var uploadCmd = &cobra.Command{
 	Use:   "upload",
@@ -89,6 +91,26 @@ var uploadCmd = &cobra.Command{
 		}
 
 		fmt.Println("server response:", string(body))
+
+		// TODO: compute a single Merkle tree root hash and keep it on the disk
+
+		err = os.RemoveAll(STORAGE_FOLDER)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+
+		err = os.MkdirAll(STORAGE_FOLDER, os.ModePerm)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+
+		rootHash := "this is a root hash"
+
+		// TODO: mutex to have thread-safe access to resource
+		// Create the file
+		err = os.WriteFile(fmt.Sprintf("%s/%s", STORAGE_FOLDER, "root-hash"), []byte(rootHash), 0666)
 	},
 }
 

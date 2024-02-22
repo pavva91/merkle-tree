@@ -1,6 +1,6 @@
 # Coding Challenge
 
-Imagine a client has a large set of potentially small files {F0, F1, …, Fn} and wants to upload them to a server and then delete its local copies. 
+Imagine a client has a large set of potentially small files {F0, F1, …, Fn} and wants to upload them to a server and then delete its local copies.
 The client wants, however, to later download an arbitrary file from the server and be convinced that the file is correct and is not corrupted in any way (in transport, tampered with by the server, etc.).
 
 You should implement the client, the server and a Merkle tree to support the above (we expect you to implement the Merkle tree rather than use a library, but you are free to use a library for the underlying hash functions).
@@ -14,3 +14,6 @@ We expect you to send us within 7 days:
 - a demo of your app that we can try (ideally using eg Docker Compose)
 - the code of the app
 - a report (max 2-3 pages) explaining your approach, your other ideas, what went well or not, etc..
+
+
+Monorepo: (https://earthly.dev/blog/golang-monorepo/)[https://earthly.dev/blog/golang-monorepo/]
