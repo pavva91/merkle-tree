@@ -23,12 +23,6 @@ var (
 const MAX_UPLOAD_SIZE = 2 * 1024 * 1024 // 2MB
 
 func (h filesHandler) BulkUpload(w http.ResponseWriter, r *http.Request) {
-	// TODO: Service Upload Bulk Files
-	if r.Method != "POST" {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-		return
-	}
-
 	// 32 MB is the default used by FormFile()
 	if err := r.ParseMultipartForm(32 << 20); err != nil {
 		errorhandlers.BadRequestHandler(w, r, errors.New("The uploaded bulk files are too big."))
@@ -102,15 +96,36 @@ func (h filesHandler) BulkUpload(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Upload successful")
 }
 
-// TODO: Fileserver
 func (h filesHandler) DownloadByName(w http.ResponseWriter, r *http.Request) {
-	// TODO: get url param (filename)
-	fileName := mux.Vars(r)["file"]
+	fileName := mux.Vars(r)["filename"]
 	log.Println(fileName)
-	// TODO: Validation
-	// http.FileServer(http.Dir("./uploads"))
 
-	// TODO: Find file
+	dirname := "./uploads"
+	filename := fileName
+
+	dir, err := os.Open(dirname)
+	if err != nil {
+		fmt.Println("Error opening directory:", err)
+		return
+	}
+	defer dir.Close()
+
+	files, err := dir.Readdir(-1)
+	if err != nil {
+		fmt.Println("Error reading directory:", err)
+		return
+	}
+
+	foundFilePath := dirname + "/"
+
+	for _, file := range files {
+		ss := strings.SplitAfter(file.Name(), "_")
+		if ss[len(ss)-1] == filename {
+			fmt.Println("File found:", file.Name())
+			foundFilePath = foundFilePath + file.Name()
+		}
+	}
+
 	arr := []string{"foo", "bar", "baz"}
 	mp := fmt.Sprintf("%+q", arr)
 	// NOTE: To reconstruct string[] from mp:
@@ -123,14 +138,16 @@ func (h filesHandler) DownloadByName(w http.ResponseWriter, r *http.Request) {
 	log.Println(result[1])
 	log.Println(result[2])
 
-	// w.Header().Add("Merkle-Proof", "merkle proofs")
 	w.Header().Add("Merkle-Proof", mp)
 
-	fileBytes, err := os.ReadFile("./uploads/3_1708595975295766854_f3")
+	// fileBytes, err := os.ReadFile("./uploads/3_1708595975295766854_f3")
+	fmt.Println(foundFilePath)
+	fileBytes, err := os.ReadFile(foundFilePath)
 	if err != nil {
 		errorhandlers.NotFoundHandler(w, r, errors.New("file not found"))
 		return
 	}
+
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/octet-stream")
 	w.Write(fileBytes)
