@@ -3,3 +3,4 @@ docker/dev/.env
 cover.out
 .env
 uploads
+bin
