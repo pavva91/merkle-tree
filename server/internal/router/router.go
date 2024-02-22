@@ -19,6 +19,5 @@ func initializeRoutes() {
 	files := Router.PathPrefix("/files").Subrouter()
 	files.HandleFunc("", handlers.FilesHandler.BulkUpload).Methods("POST")
 	files.HandleFunc("/", handlers.FilesHandler.BulkUpload).Methods("POST")
-	files.HandleFunc("/{file:[a-z0-9]+}", handlers.FilesHandler.DownloadByName).Methods("GET")
-
+	files.HandleFunc("/{filename:[a-z]+[0-9]+}", handlers.FilesHandler.DownloadByName).Methods("GET")
 }
