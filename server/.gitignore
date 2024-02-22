@@ -2,3 +2,4 @@ config/dev-config.yml
 docker/dev/.env
 cover.out
 .env
+uploads
