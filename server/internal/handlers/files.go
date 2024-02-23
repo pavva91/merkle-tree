@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
+	"github.com/pavva91/merkle-tree/libs/merkletree"
 	"github.com/pavva91/merkle-tree/server/internal/errorhandlers"
 )
 
@@ -18,6 +19,7 @@ type filesHandler struct{}
 
 var (
 	FilesHandler = filesHandler{}
+	MerkleTree   = [][]string{}
 )
 
 // TODO: Use configs (file and envvars)
@@ -47,6 +49,7 @@ func (h filesHandler) BulkUpload(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	var rFiles []*os.File
 	for k, fileHeader := range files {
 		// Restrict the size of each uploaded file to 1MB.
 		// To prevent the aggregate size from exceeding
@@ -79,7 +82,8 @@ func (h filesHandler) BulkUpload(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		// TODO: add client identifier (to handle multiple clients)
-		f, err := os.Create(fmt.Sprintf("%s/%d_%d_%s", UPLOAD_FOLDER, k+1, time.Now().UnixNano(), fileHeader.Filename))
+		fileName := fmt.Sprintf("%s/%d_%d_%s", UPLOAD_FOLDER, k+1, time.Now().UnixNano(), fileHeader.Filename)
+		f, err := os.Create(fileName)
 		// f, err := os.Create(fmt.Sprintf("./uploads/%d_%d_%s", k+1, time.Now().UnixNano(), fileHeader.Filename))
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
@@ -93,9 +97,25 @@ func (h filesHandler) BulkUpload(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
-	}
-	// TODO: Create Merkle Tree (get files from local storage)
 
+		file2, err := os.Open(fileName)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		rFiles = append(rFiles, file2)
+		defer file2.Close()
+	}
+
+	// TODO: Save MerkleTree
+	// TODO: 1. Save in memory
+	MerkleTree, err = merkletree.ComputeMerkleTreeAsMatrix(rFiles...)
+	if err != nil {
+		errorhandlers.InternalServerErrorHandler(w, r)
+		return
+	}
+
+	fmt.Println("merkle-root of created merkle tree", MerkleTree[len(MerkleTree)-1][0])
 	fmt.Fprintf(w, "Upload successful")
 }
 
@@ -128,11 +148,6 @@ func (h filesHandler) DownloadByName(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	// TODO: Calculate merkle proof (library)
-	arr := []string{"foo", "bar", "baz"}
-	mp := fmt.Sprintf("%+q", arr)
-	w.Header().Add("Merkle-Proof", mp)
-
 	// fileBytes, err := os.ReadFile("./uploads/3_1708595975295766854_f3")
 	fmt.Println(foundFilePath)
 	fileBytes, err := os.ReadFile(foundFilePath)
@@ -140,6 +155,21 @@ func (h filesHandler) DownloadByName(w http.ResponseWriter, r *http.Request) {
 		errorhandlers.NotFoundHandler(w, r, errors.New("file not found"))
 		return
 	}
+
+	file, err := os.Open(foundFilePath)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	defer file.Close()
+
+	// arr := []string{"foo", "bar", "baz"}
+	// TODO: retrieve merkletree from DB
+	// TODO: Calculate merkle proof (library)
+	arr := merkletree.ComputeMerkleProof(file, MerkleTree)
+	fmt.Println("size", len(arr))
+	mp := fmt.Sprintf("%+q", arr)
+	w.Header().Add("Merkle-Proof", mp)
 
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/octet-stream")

@@ -12,6 +12,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/pavva91/merkle-tree/libs/merkletree"
 	"github.com/spf13/cobra"
 )
 
@@ -45,6 +46,7 @@ var uploadCmd = &cobra.Command{
 			return
 		}
 
+		var rFiles []*os.File
 		for _, f := range files {
 			filePath := uploadFolder + "/" + f.Name()
 			file, err := os.Open(filePath)
@@ -53,8 +55,17 @@ var uploadCmd = &cobra.Command{
 				return
 			}
 			defer file.Close()
-			part1, err := writer.CreateFormFile("file", filepath.Base(filePath))
-			_, err = io.Copy(part1, file)
+
+			file2, err := os.Open(filePath)
+			if err != nil {
+				fmt.Println(err)
+				return
+			}
+			rFiles = append(rFiles, file2)
+			defer file2.Close()
+
+			part, err := writer.CreateFormFile("file", filepath.Base(filePath))
+			_, err = io.Copy(part, file)
 			if err != nil {
 				fmt.Println(err)
 				return
@@ -93,6 +104,7 @@ var uploadCmd = &cobra.Command{
 		fmt.Println("server response:", string(body))
 
 		// TODO: compute a single Merkle tree root hash and keep it on the disk
+		rootHash, err := merkletree.ComputeRootHash(rFiles...)
 
 		err = os.RemoveAll(STORAGE_FOLDER)
 		if err != nil {
@@ -106,7 +118,7 @@ var uploadCmd = &cobra.Command{
 			return
 		}
 
-		rootHash := "this is a root hash"
+		// rootHash = "this is a root hash"
 
 		// TODO: mutex to have thread-safe access to resource
 		// Create the file

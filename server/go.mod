@@ -1,6 +1,6 @@
 module github.com/pavva91/merkle-tree/server
 
-go 1.21.6
+go 1.22.0
 
 require (
 	github.com/gorilla/mux v1.8.1
@@ -11,6 +11,8 @@ require (
 	gorm.io/driver/postgres v1.5.5
 	gorm.io/gorm v1.25.7
 )
+
+require github.com/pavva91/merkle-tree/libs/merkletree v0.0.0 // indirect
 
 require (
 	github.com/KyleBanks/depth v1.2.1 // indirect

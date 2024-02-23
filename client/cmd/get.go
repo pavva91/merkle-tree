@@ -33,8 +33,6 @@ var getCmd = &cobra.Command{
 			// TODO: Return error and stop execution
 		}
 
-		fmt.Println(merkletree.Hello("Valer"))
-
 		URL := "http://localhost:8080/files/" + fileName
 
 		fmt.Println("Try to get '" + fileName + "' file...")
@@ -80,9 +78,9 @@ var getCmd = &cobra.Command{
 			mp := response.Header.Get("Merkle-Proof")
 			// NOTE: To reconstruct string[] from mp:
 			merkleProofs := strings.SplitAfter(strings.Replace(strings.Replace(strings.Replace(mp, "[", "", -1), "]", "", -1), "\"", "", -1), " ")
-			log.Println(merkleProofs[0])
-			log.Println(merkleProofs[1])
-			log.Println(merkleProofs[2])
+			for k, v := range merkleProofs {
+				log.Printf("proof %v: %s", k, v)
+			}
 
 			// TODO: Verify merkle-proof with file hash and root hash
 			f, err := os.Open(DOWNLOAD_FOLDER + "/" + fileName)
@@ -96,11 +94,20 @@ var getCmd = &cobra.Command{
 				log.Fatal(err)
 			}
 
-			// fmt.Printf("hashFile file: %x", h.Sum(nil))
-			hashFile := fmt.Sprintf("hash file: %x\n", h.Sum(nil))
+			hashFile := fmt.Sprintf("%x", h.Sum(nil))
+			fmt.Println("hash file:", hashFile)
+			// hashFile = "0dffefeae189629164f222e18c83883c1fd9b5b02eb55d5ca99bd207ebcf882d"
+
 			// TODO: Verify file with merkle tree (library)
-			// merkleTree.Verify(hash, mp, rootHash)
-			fmt.Println(hashFile)
+			// merkletree.ComputeMerkleProof(f, )
+			// TODO: get rootHash from ./storage
+			rootHash := "5880895435d8c5d8c8b549b520ef550882ab0245e1b241594c44ddffe5a6a8c0"
+			reconstructedRootHash := merkletree.ReconstructRootHash(hashFile, merkleProofs)
+			isNotCorrupted := merkletree.Verify(hashFile, merkleProofs, rootHash)
+
+			fmt.Println("wanted root hash:", rootHash)
+			fmt.Println("reconstructed root hash:", reconstructedRootHash)
+			fmt.Println("file is not corrupted:", isNotCorrupted)
 
 		} else {
 			fmt.Println("Error: " + fileName + " not exists! :-(")
