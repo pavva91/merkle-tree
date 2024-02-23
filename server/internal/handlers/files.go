@@ -18,8 +18,8 @@ import (
 type filesHandler struct{}
 
 var (
-	FilesHandler = filesHandler{}
-	MerkleTree   = [][]string{}
+	FilesHandler     = filesHandler{}
+	MerkleTreeMatrix = [][]string{}
 )
 
 // TODO: Use configs (file and envvars)
@@ -109,13 +109,13 @@ func (h filesHandler) BulkUpload(w http.ResponseWriter, r *http.Request) {
 
 	// TODO: Save MerkleTree
 	// TODO: 1. Save in memory
-	MerkleTree, err = merkletree.ComputeMerkleTreeAsMatrix(rFiles...)
+	MerkleTreeMatrix, err = merkletree.ComputeMerkleTreeAsMatrix(rFiles...)
 	if err != nil {
 		errorhandlers.InternalServerErrorHandler(w, r)
 		return
 	}
 
-	fmt.Println("merkle-root of created merkle tree", MerkleTree[len(MerkleTree)-1][0])
+	fmt.Println("merkle-root of created merkle tree", MerkleTreeMatrix[len(MerkleTreeMatrix)-1][0])
 	fmt.Fprintf(w, "Upload successful")
 }
 
@@ -163,13 +163,10 @@ func (h filesHandler) DownloadByName(w http.ResponseWriter, r *http.Request) {
 	}
 	defer file.Close()
 
-	// arr := []string{"foo", "bar", "baz"}
 	// TODO: retrieve merkletree from DB
-	// TODO: Calculate merkle proof (library)
-	arr := merkletree.ComputeMerkleProof(file, MerkleTree)
-	fmt.Println("size", len(arr))
-	mp := fmt.Sprintf("%+q", arr)
-	w.Header().Add("Merkle-Proof", mp)
+	merkleProofs := merkletree.ComputeMerkleProof(file, MerkleTreeMatrix)
+	mps := fmt.Sprintf("%+q", merkleProofs)
+	w.Header().Add("Merkle-Proof", mps)
 
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/octet-stream")

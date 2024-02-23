@@ -72,8 +72,6 @@ var getCmd = &cobra.Command{
 				fmt.Println(err)
 			}
 
-			fmt.Printf("Perfect! Just saved in %s/%s!\n", DOWNLOAD_FOLDER, fileName)
-
 			// Get Merkle Proof
 			mp := response.Header.Get("Merkle-Proof")
 			// NOTE: To reconstruct string[] from mp:
@@ -96,18 +94,38 @@ var getCmd = &cobra.Command{
 
 			hashFile := fmt.Sprintf("%x", h.Sum(nil))
 			fmt.Println("hash file:", hashFile)
-			// hashFile = "0dffefeae189629164f222e18c83883c1fd9b5b02eb55d5ca99bd207ebcf882d"
 
-			// TODO: Verify file with merkle tree (library)
-			// merkletree.ComputeMerkleProof(f, )
-			// TODO: get rootHash from ./storage
-			rootHash := "5880895435d8c5d8c8b549b520ef550882ab0245e1b241594c44ddffe5a6a8c0"
+			file, err := os.Open(STORAGE_FOLDER + "/root-hash")
+			if err != nil {
+				fmt.Println(err)
+				return
+			}
+			defer file.Close()
+
+			rootHashBytes, err := io.ReadAll(file)
+
+			// print human readable
+			rootHash := fmt.Sprint(string(rootHashBytes))
+			fmt.Println("root hash retrieved:", rootHash)
+
+			//NOTE: Verify file with merkle tree (library)
 			reconstructedRootHash := merkletree.ReconstructRootHash(hashFile, merkleProofs)
-			isNotCorrupted := merkletree.Verify(hashFile, merkleProofs, rootHash)
 
 			fmt.Println("wanted root hash:", rootHash)
 			fmt.Println("reconstructed root hash:", reconstructedRootHash)
-			fmt.Println("file is not corrupted:", isNotCorrupted)
+
+			if merkletree.Verify(hashFile, merkleProofs, rootHash) {
+				fmt.Printf("file %s is not corrupted\n", fileName)
+				fmt.Printf("downloaded file saved in %s/%s!\n", DOWNLOAD_FOLDER, fileName)
+
+			} else {
+				fmt.Printf("file %s is corrupted\n", fileName)
+				err := os.Remove(DOWNLOAD_FOLDER + "/" + fileName)
+				if err != nil {
+					fmt.Println("Error during removal of " + fileName)
+					return
+				}
+			}
 
 		} else {
 			fmt.Println("Error: " + fileName + " not exists! :-(")
