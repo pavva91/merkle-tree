@@ -1,6 +1,6 @@
 package config
 
-var ServerConfigValues ServerConfig
+var Values ServerConfig
 
 // Model that links to config.yml file
 type ServerConfig struct {

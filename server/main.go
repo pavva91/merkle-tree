@@ -8,7 +8,6 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
-	"strconv"
 	"time"
 
 	"gopkg.in/yaml.v2"
@@ -54,19 +53,8 @@ func main() {
 	log.Printf("Using envvar value, must be USE_ENVVAR=\"true\" to run with environment variable, otherwise will use config file by default: %s", useEnvVar)
 
 	if useEnvVar == "true" {
-		conns, err := strconv.Atoi(os.Getenv("DB_CONNECTIONS"))
-		if err != nil {
-			log.Panicf("Incorrect DB connections, must be int: %s\nInterrupt execution", strconv.Itoa(conns))
-		}
-		config.ServerConfigValues.Database.Connections = conns
-		config.ServerConfigValues.Database.Name = os.Getenv("DB_NAME")
-		config.ServerConfigValues.Database.Host = os.Getenv("DB_HOST")
-		config.ServerConfigValues.Database.Password = os.Getenv("DB_PASSWORD")
-		config.ServerConfigValues.Database.Port = os.Getenv("DB_PORT")
-		config.ServerConfigValues.Database.Username = os.Getenv("DB_USERNAME")
-		config.ServerConfigValues.Database.Timezone = os.Getenv("DB_TIMEZONE")
-		config.ServerConfigValues.Server.Host = os.Getenv("SERVER_HOST")
-		config.ServerConfigValues.Server.Port = os.Getenv("SERVER_PORT")
+		config.Values.Server.Host = os.Getenv("SERVER_HOST")
+		config.Values.Server.Port = os.Getenv("SERVER_PORT")
 	} else {
 		env := os.Getenv("SERVER_ENVIRONMENT")
 
@@ -96,11 +84,11 @@ func main() {
 	// }
 
 	// run the server
-	fmt.Printf("Server is running on host %s\n", config.ServerConfigValues.Server.Host)
-	fmt.Printf("Server is running on port %s\n", config.ServerConfigValues.Server.Port)
+	fmt.Printf("Server is running on host %s\n", config.Values.Server.Host)
+	fmt.Printf("Server is running on port %s\n", config.Values.Server.Port)
 	// addr := fmt.Sprint("127.0.0.1:" + config.ServerConfigValues.Server.Port)
 	// addr := fmt.Sprint("0.0.0.0:" + config.ServerConfigValues.Server.Port)
-	addr := fmt.Sprint(config.ServerConfigValues.Server.Host + ":" + config.ServerConfigValues.Server.Port)
+	addr := fmt.Sprint(config.Values.Server.Host + ":" + config.Values.Server.Port)
 
 	srv := &http.Server{
 		// Addr: "0.0.0.0:8080",
@@ -154,7 +142,7 @@ func setConfig(path string) {
 	defer f.Close()
 
 	decoder := yaml.NewDecoder(f)
-	err = decoder.Decode(&config.ServerConfigValues)
+	err = decoder.Decode(&config.Values)
 	if err != nil {
 		log.Fatal(err)
 	}
