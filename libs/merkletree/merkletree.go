@@ -14,6 +14,7 @@ import (
 // Returns true if the file is not tampered
 // Returns false if the file is tampered
 func Verify(hashFile string, merkleProofs []string, wantedRootHash string) bool {
+	// TODO: Check if input string is hash (len)
 	reconstructedRootHash := ReconstructRootHash(hashFile, merkleProofs)
 	isCorrect := reconstructedRootHash == wantedRootHash
 	return isCorrect
@@ -25,6 +26,7 @@ func Verify(hashFile string, merkleProofs []string, wantedRootHash string) bool 
 // 2. merkleProofs needed to reconstruct the root hash
 // will return the root hash
 func ReconstructRootHash(hashFile string, merkleProof []string) string {
+	// TODO: Check if input string is hash (len)
 	rootHash := ""
 	hash := hashFile
 	for k, mp := range merkleProof {
