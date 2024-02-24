@@ -1,60 +1,28 @@
-definitions:
-  dto.CreateTaskRequest:
-    properties:
-      headers:
-        additionalProperties: true
-        type: object
-      method:
-        type: string
-      url:
-        type: string
-    type: object
-  dto.CreateTaskResponse:
-    properties:
-      id:
-        type: integer
-    type: object
-  dto.GetTaskResponse:
-    properties:
-      headers:
-        additionalProperties: true
-        description: 'headers from 3rd party service response'
-        type: object
-      httpStatusCode:
-        type: integer
-      id:
-        type: integer
-      length:
-        type: integer
-      status:
-        type: string
-    type: object
 host: localhost:8080
 info:
   contact: {}
-  description: HTTP server for a service that makes http requests to 3rd-party services
-  title: Task Third Party HTTP Server
+  description: HTTP File Server with Merkle Tree to ensure that the downloaded data
+    is not tampered
+  title: File Server with Merkle Tree
   version: "1.0"
 paths:
-  /task:
+  /files:
     post:
       consumes:
-      - application/json
-      description: Create a Task
+      - multipart/form-data
+      description: Bulk Upload all files in a given folder and create merkle tree
       parameters:
-      - description: query params
-        in: body
-        name: request
+      - collectionFormat: csv
+        description: files to upload
+        in: formData
+        items:
+          type: file
+        name: file
         required: true
-        schema:
-          $ref: '#/definitions/dto.CreateTaskRequest'
+        type: array
       produces:
-      - application/json
+      - text/plain
       responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/dto.CreateTaskResponse'
         "400":
           description: Bad Request
           schema:
@@ -63,28 +31,24 @@ paths:
           description: Internal Server Error
           schema:
             type: string
-      summary: Create Task
+      summary: Bulk Upload
       tags:
-      - Task
-  /task/{id}:
+      - Files
+  /files/{filename}:
     get:
       consumes:
       - application/json
-      description: Get a Task, given the id
+      description: Download By Name
       parameters:
-      - description: Task ID
-        format: integer
+      - description: File Name
+        format: string
         in: path
-        name: id
+        name: filename
         required: true
-        type: integer
+        type: string
       produces:
       - application/json
       responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/dto.GetTaskResponse'
         "400":
           description: Bad Request
           schema:
@@ -97,7 +61,7 @@ paths:
           description: Internal Server Error
           schema:
             type: string
-      summary: Get Task
+      summary: Download
       tags:
-      - Task
+      - Files
 swagger: "2.0"

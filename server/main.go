@@ -14,7 +14,6 @@ import (
 	"gopkg.in/yaml.v2"
 
 	"github.com/pavva91/merkle-tree/server/config"
-	"github.com/pavva91/merkle-tree/server/internal/db"
 	"github.com/pavva91/merkle-tree/server/internal/middleware"
 	"github.com/pavva91/merkle-tree/server/internal/router"
 
@@ -23,9 +22,9 @@ import (
 	httpSwagger "github.com/swaggo/http-swagger/v2"
 )
 
-//	@title			Task Third Party HTTP Server
+//	@title			File Server with Merkle Tree
 //	@version		1.0
-//	@description	HTTP server for a service that makes http requests to 3rd-party services
+//	@description	HTTP File Server with Merkle Tree to ensure that the downloaded data is not tampered
 
 // @host	localhost:8080
 func main() {
@@ -87,14 +86,14 @@ func main() {
 	}
 
 	// connect to db
-	db.ORM.MustConnectToDB(config.ServerConfigValues)
-	err := db.ORM.GetDB().AutoMigrate(
+	// db.ORM.MustConnectToDB(config.ServerConfigValues)
+	// err := db.ORM.GetDB().AutoMigrate(
 	// &models.File{},
-	)
-	if err != nil {
-		log.Panicln("error retrieving DB")
-		return
-	}
+	// )
+	// if err != nil {
+	// 	log.Panicln("error retrieving DB")
+	// 	return
+	// }
 
 	// run the server
 	fmt.Printf("Server is running on host %s\n", config.ServerConfigValues.Server.Host)
@@ -134,7 +133,7 @@ func main() {
 	defer cancel()
 	// Doesn't block if no connections, but will otherwise wait
 	// until the timeout deadline.
-	err = srv.Shutdown(ctx)
+	err := srv.Shutdown(ctx)
 	if err != nil {
 		log.Panicln("error shutting down gracefully, panic")
 		return

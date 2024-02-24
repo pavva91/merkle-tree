@@ -26,7 +26,20 @@ var (
 const MAX_UPLOAD_SIZE = 2 * 1024 * 1024 // 2MB
 const UPLOAD_FOLDER = "./uploads"
 
+// Bulk Upload godoc
+//
+//	@Summary		Bulk Upload
+//	@Description	Bulk Upload all files in a given folder and create merkle tree
+//	@Tags			Files
+//	@Accept			multipart/form-data
+//	@Produce		text/plain
+//	@Param			file	formData		[]file	true	"files to upload"
+//	@Failure		400		{object}	string
+//	@Failure		500		{object}	string
+//	@Router			/files [post]
 func (h filesHandler) BulkUpload(w http.ResponseWriter, r *http.Request) {
+	// TODO: if it is just one file merkle tree will simply be the file hash
+
 	// 32 MB is the default used by FormFile()
 	if err := r.ParseMultipartForm(32 << 20); err != nil {
 		errorhandlers.BadRequestHandler(w, r, errors.New("The uploaded bulk files are too big."))
@@ -119,7 +132,26 @@ func (h filesHandler) BulkUpload(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Upload successful")
 }
 
+// Download godoc
+//
+//	@Summary		Download
+//	@Description	Download By Name
+//	@Tags			Files
+//	@Accept			json
+//	@Produce		json
+//	@Param			filename	path		string	true	"File Name"	Format(string)
+//	@Failure		400		{object}	string
+//	@Failure		404		{object}	string
+//	@Failure		500		{object}	string
+//	@Router			/files/{filename} [get]
 func (h filesHandler) DownloadByName(w http.ResponseWriter, r *http.Request) {
+	// TODO: Validation
+	if len(MerkleTreeMatrix) == 0 {
+		log.Println("no merkle tree, upload files first")
+		errorhandlers.BadRequestHandler(w, r, errors.New("no merkle tree, upload files first"))
+		return
+	}
+
 	fileName := mux.Vars(r)["filename"]
 	log.Println(fileName)
 

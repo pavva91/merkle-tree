@@ -15,37 +15,33 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/task": {
+        "/files": {
             "post": {
-                "description": "Create a Task",
+                "description": "Bulk Upload all files in a given folder and create merkle tree",
                 "consumes": [
-                    "application/json"
+                    "multipart/form-data"
                 ],
                 "produces": [
-                    "application/json"
+                    "text/plain"
                 ],
                 "tags": [
-                    "Task"
+                    "Files"
                 ],
-                "summary": "Create Task",
+                "summary": "Bulk Upload",
                 "parameters": [
                     {
-                        "description": "query params",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.CreateTaskRequest"
-                        }
+                        "type": "array",
+                        "items": {
+                            "type": "file"
+                        },
+                        "collectionFormat": "csv",
+                        "description": "files to upload",
+                        "name": "file",
+                        "in": "formData",
+                        "required": true
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/dto.CreateTaskResponse"
-                        }
-                    },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
@@ -61,9 +57,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/task/{id}": {
+        "/files/{filename}": {
             "get": {
-                "description": "Get a Task, given the id",
+                "description": "Download By Name",
                 "consumes": [
                     "application/json"
                 ],
@@ -71,26 +67,20 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Task"
+                    "Files"
                 ],
-                "summary": "Get Task",
+                "summary": "Download",
                 "parameters": [
                     {
-                        "type": "integer",
-                        "format": "integer",
-                        "description": "Task ID",
-                        "name": "id",
+                        "type": "string",
+                        "format": "string",
+                        "description": "File Name",
+                        "name": "filename",
                         "in": "path",
                         "required": true
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/dto.GetTaskResponse"
-                        }
-                    },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
@@ -112,53 +102,6 @@ const docTemplate = `{
                 }
             }
         }
-    },
-    "definitions": {
-        "dto.CreateTaskRequest": {
-            "type": "object",
-            "properties": {
-                "headers": {
-                    "type": "object",
-                    "additionalProperties": true
-                },
-                "method": {
-                    "type": "string"
-                },
-                "url": {
-                    "type": "string"
-                }
-            }
-        },
-        "dto.CreateTaskResponse": {
-            "type": "object",
-            "properties": {
-                "id": {
-                    "type": "integer"
-                }
-            }
-        },
-        "dto.GetTaskResponse": {
-            "type": "object",
-            "properties": {
-                "headers": {
-                    "description": "headers from 3rd party service response",
-                    "type": "object",
-                    "additionalProperties": true
-                },
-                "httpStatusCode": {
-                    "type": "integer"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "length": {
-                    "type": "integer"
-                },
-                "status": {
-                    "type": "string"
-                }
-            }
-        }
     }
 }`
 
@@ -168,8 +111,8 @@ var SwaggerInfo = &swag.Spec{
 	Host:             "localhost:8080",
 	BasePath:         "",
 	Schemes:          []string{},
-	Title:            "Task Third Party HTTP Server",
-	Description:      "HTTP server for a service that makes http requests to 3rd-party services",
+	Title:            "File Server with Merkle Tree",
+	Description:      "HTTP File Server with Merkle Tree to ensure that the downloaded data is not tampered",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",
