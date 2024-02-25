@@ -1,10 +1,12 @@
 services:
   goserver:
-    build: .
+    build:
+      context: .
+      dockerfile: ./Dockerfile.server
     env_file: .env
     container_name: merkle-tree-file-server
     environment:
-      - USE_ENVVAR=true             
+      - USE_ENVVAR=true
       - SERVER_HOST=0.0.0.0
       - SERVER_PORT=${PORT}
       - MAX_BULK_UPLOAD_SIZE=33554432
@@ -13,5 +15,18 @@ services:
 
     ports:
       - "${PORT}:${PORT}"
-      # - "8080:8080"
+  client:
+    depends_on:
+      - goserver
+    build: 
+      context: .
+      dockerfile: ./Dockerfile.client
+    container_name: mt-client
+    stdin_open: true
+    tty: true
+    environment:
+      - DEFAULT_STORAGE_FOLDER=./storage
+      - DEFAULT_DOWNLOAD_FOLDER=./downloads
+      - DEFAULT_UPLOAD_FOLDER=./testfiles
+      - SERVER_URL=http://172.17.0.1:${PORT}
 version: "3.8"

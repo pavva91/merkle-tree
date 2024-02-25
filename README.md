@@ -37,21 +37,18 @@ For the solution I created this monorepo with the 3 codebases:
 
 To run the demo these 2 steps are needed to spin-up the server and the client:
 
-#### 1. Run Server
+#### 1. Run Server & Client
 
 ```bash
-docker compose up
+docker compose up -d
 ```
 
 Check the Swagger API in [http://localhost:8080/swagger/index.html](http://localhost:8080/swagger/index.html)
 
-#### 2. Run Client
-
-##### Build
+#### 2. Open Client
 
 ```bash
-cd client
-task build
+docker exec -it mt-client bash
 ```
 
 Then the two actions that the client does:
@@ -65,13 +62,19 @@ The client uploads a large set of potentially small files {F0, F1, …, Fn} to a
 To run with defaults:
 
 ```bash
-./bin/client-cli upload
+mt-client upload
 ```
 
 To personalize paths of upload and store root hash folders:
 
 ```bash
-./bin/client-cli upload --dir ~/path/to/folder/to/bulk/upload --store ~/path/to/dir/store/root/hash
+mt-client upload --dir ~/path/to/folder/to/bulk/upload --store ~/path/to/dir/store/root/hash
+```
+
+or:
+
+```bash
+mt-client upload -d ~/path/to/folder/to/bulk/upload -s ~/path/to/dir/store/root/hash
 ```
 
 ##### b) Get a file from the server and checks its integrity
@@ -81,11 +84,15 @@ The client downloads an arbitrary file from the server and checks that the file 
 **_NOTE:_** By default the client downloads the file into `./client/downloads`
 
 ```bash
-./bin/client-cli get f1
+mt-client get f1
 ```
 
 To personalize paths of download and retrieve stored root hash folders:
 
 ```bash
-./bin/client-cli get --dir ~/path/to/folder/to/download/file --store ~/path/to/dir/store/root/hash f1
+mt-client get --dir ~/path/to/folder/to/download/file --store ~/path/to/dir/store/root/hash f1
+```
+
+```bash
+mt-client get -d ~/path/to/folder/to/download/file -s ~/path/to/dir/store/root/hash f1
 ```

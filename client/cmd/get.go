@@ -187,10 +187,10 @@ var getCmd = &cobra.Command{
 
 func init() {
 
-	viper.SetDefault("DEFAULT_STORAGE_FOLDER", "./storage")
-	viper.SetDefault("DEFAULT_UPLOAD_FOLDER", "./testfiles")
-	viper.SetDefault("DEFAULT_DOWNLOAD_FOLDER", "./downloads")
-	viper.SetDefault("SERVER_URL", "http://localhost:8080")
+	// viper.SetDefault("DEFAULT_STORAGE_FOLDER", "./storage")
+	// viper.SetDefault("DEFAULT_UPLOAD_FOLDER", "./testfiles")
+	// viper.SetDefault("DEFAULT_DOWNLOAD_FOLDER", "./downloads")
+	// viper.SetDefault("SERVER_URL", "http://localhost:8080")
 
 	rootCmd.AddCommand(getCmd)
 

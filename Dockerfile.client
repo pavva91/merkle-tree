@@ -1,0 +1,15 @@
+FROM golang:1.22
+
+WORKDIR /root/app
+
+COPY ./libs ./libs/
+COPY ./client ./client/
+
+# WORKDIR /usr/src/app/client
+WORKDIR /root/app/client
+
+RUN go mod download && go mod verify
+
+RUN go build -v -o /usr/local/bin/mt-client ./main.go
+
+ENTRYPOINT ["bash"]
