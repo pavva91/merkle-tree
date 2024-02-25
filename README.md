@@ -2,6 +2,12 @@
 
 [![Go](https://github.com/pavva91/merkle-tree/actions/workflows/go.yml/badge.svg)](https://github.com/pavva91/merkle-tree/actions/workflows/go.yml)
 
+[![Go Report Card Merkle Tree Library](https://goreportcard.com/badge/github.com/pavva91/merkle-tree/libs/merkletree)](https://goreportcard.com/report/github.com/pavva91/merkle-tree/libs/merkletree)
+
+[![Go Report Card Server](https://goreportcard.com/badge/github.com/pavva91/merkle-tree/server)](https://goreportcard.com/report/github.com/pavva91/merkle-tree/server)
+
+[![Go Report Card Client](https://goreportcard.com/badge/github.com/pavva91/merkle-tree/client)](https://goreportcard.com/report/github.com/pavva91/merkle-tree/client)
+
 ## Description
 
 Imagine a client has a large set of potentially small files {F0, F1, …, Fn} and wants to upload them to a server and then delete its local copies.
