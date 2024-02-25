@@ -7,6 +7,10 @@ import (
 	"testing"
 )
 
+const (
+	test3FilesPath = "./testfiles/3files"
+)
+
 func Test_createMerkleTreeAsMatrix(t *testing.T) {
 	type args struct {
 		hashLeaves []string
@@ -358,8 +362,7 @@ func Test_isHashFileCorrect(t *testing.T) {
 }
 
 func TestComputeMerkleTreeAsMatrix(t *testing.T) {
-	testFilesPath := "./testfiles"
-	files, err := os.ReadDir(testFilesPath)
+	files, err := os.ReadDir(test3FilesPath)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -367,7 +370,7 @@ func TestComputeMerkleTreeAsMatrix(t *testing.T) {
 
 	var fFiles []*os.File
 	for _, f := range files {
-		filePath := fmt.Sprintf("%s/%s", testFilesPath, f.Name())
+		filePath := fmt.Sprintf("%s/%s", test3FilesPath, f.Name())
 		ff, err := os.Open(filePath)
 		if err != nil {
 			fmt.Println(err)
@@ -412,8 +415,7 @@ func TestComputeMerkleTreeAsMatrix(t *testing.T) {
 	}
 }
 func TestComputeRootHash(t *testing.T) {
-	testFilesPath := "./testfiles"
-	files, err := os.ReadDir(testFilesPath)
+	files, err := os.ReadDir(test3FilesPath)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -421,7 +423,7 @@ func TestComputeRootHash(t *testing.T) {
 
 	var fFiles []*os.File
 	for _, f := range files {
-		filePath := fmt.Sprintf("%s/%s", testFilesPath, f.Name())
+		filePath := fmt.Sprintf("%s/%s", test3FilesPath, f.Name())
 		ff, err := os.Open(filePath)
 		if err != nil {
 			fmt.Println(err)
@@ -463,8 +465,7 @@ func TestComputeRootHash(t *testing.T) {
 }
 
 func TestComputeMerkleProof(t *testing.T) {
-	testFilesPath := "./testfiles"
-	files, err := os.ReadDir(testFilesPath)
+	files, err := os.ReadDir(test3FilesPath)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -472,7 +473,7 @@ func TestComputeMerkleProof(t *testing.T) {
 
 	var fFiles []*os.File
 	for _, f := range files {
-		filePath := fmt.Sprintf("%s/%s", testFilesPath, f.Name())
+		filePath := fmt.Sprintf("%s/%s", test3FilesPath, f.Name())
 		ff, err := os.Open(filePath)
 		if err != nil {
 			fmt.Println(err)
@@ -556,8 +557,7 @@ func TestComputeMerkleProof(t *testing.T) {
 }
 
 func TestReconstructRootHash(t *testing.T) {
-	testFilesPath := "./testfiles"
-	files, err := os.ReadDir(testFilesPath)
+	files, err := os.ReadDir(test3FilesPath)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -565,7 +565,7 @@ func TestReconstructRootHash(t *testing.T) {
 
 	var fFiles []*os.File
 	for _, f := range files {
-		filePath := fmt.Sprintf("%s/%s", testFilesPath, f.Name())
+		filePath := fmt.Sprintf("%s/%s", test3FilesPath, f.Name())
 		ff, err := os.Open(filePath)
 		if err != nil {
 			fmt.Println(err)
@@ -634,8 +634,7 @@ func TestReconstructRootHash(t *testing.T) {
 }
 
 func TestIsFileCorrect(t *testing.T) {
-	testFilesPath := "./testfiles"
-	files, err := os.ReadDir(testFilesPath)
+	files, err := os.ReadDir(test3FilesPath)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -643,7 +642,7 @@ func TestIsFileCorrect(t *testing.T) {
 
 	var fFiles []*os.File
 	for _, f := range files {
-		filePath := fmt.Sprintf("%s/%s", testFilesPath, f.Name())
+		filePath := fmt.Sprintf("%s/%s", test3FilesPath, f.Name())
 		ff, err := os.Open(filePath)
 		if err != nil {
 			fmt.Println(err)
