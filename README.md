@@ -15,5 +15,39 @@ We expect you to send us within 7 days:
 - the code of the app
 - a report (max 2-3 pages) explaining your approach, your other ideas, what went well or not, etc..
 
+## Solution
 
-Monorepo: (https://earthly.dev/blog/golang-monorepo/)[https://earthly.dev/blog/golang-monorepo/]
+For the solution I created this monorepo with the 3 codebases:
+
+- ./libs/merkletree/ : is the shared library that implements the Merkle Tree logic.
+- ./server/ : Is the server that stores the files and linked Merkle Tree.
+- ./client/ : Is the client that bulk uploads files, computes and stores their "root-hash" and then downloads one of them and checks its integrity with the locally stored "root-hash".
+
+### Run
+
+#### Run Server
+
+```bash
+docker compose up
+```
+
+#### Run Client
+
+##### Build
+
+```bash
+cd client
+task build
+```
+
+##### 1) Bulk upload files from a folder (by default from ./client/testfiles/)
+
+```bash
+./bin/client-cli upload
+```
+
+##### 2) Get a file from the server and checks its integrity
+
+```bash
+./bin/client-cli get f1
+```
