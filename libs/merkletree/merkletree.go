@@ -10,7 +10,6 @@ import (
 	"strings"
 )
 
-// TODO: Test with real files (./testfiles/)
 // TODO: Check go docs best practices
 
 // IsFileCorrect if the file is correct and is not tampered.
@@ -24,13 +23,10 @@ func IsFileCorrect(file *os.File, merkleProofs []string, wantedRootHash string) 
 	}
 
 	hashFile := fmt.Sprintf("%x", h.Sum(nil))
-	fmt.Println("HASH FILE verify:", hashFile)
 	return isHashFileCorrect(hashFile, merkleProofs, wantedRootHash), nil
 }
 
 func isHashFileCorrect(hashFile string, merkleProofs []string, wantedRootHash string) bool {
-	// TODO: Check if input string is hash (len)
-	// TODO: Check if merkleProof is consistent with merkletree (merkleProof ~= len(merkleTree)-1)
 	reconstructedRootHash := reconstructRootHash(hashFile, merkleProofs)
 	return reconstructedRootHash == wantedRootHash
 }
@@ -43,7 +39,6 @@ func ReconstructRootHash(file *os.File, merkleProofs []string) (string, error) {
 	}
 
 	hashFile := fmt.Sprintf("%x", h.Sum(nil))
-	fmt.Println("HASH FILE reconstruct:", hashFile)
 	return reconstructRootHash(hashFile, merkleProofs), nil
 }
 

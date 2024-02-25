@@ -1,35 +1,11 @@
 package merkletree
 
 import (
+	"fmt"
 	"os"
 	"reflect"
 	"testing"
 )
-
-func TestComputeRootHash(t *testing.T) {
-	type args struct {
-		files []*os.File
-	}
-	tests := map[string]struct {
-		args    args
-		want    string
-		wantErr bool
-	}{
-		// TODO: Add test cases.
-	}
-	for name, tt := range tests {
-		t.Run(name, func(t *testing.T) {
-			got, err := ComputeRootHash(tt.args.files...)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("ComputeRootHash() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if got != tt.want {
-				t.Errorf("ComputeRootHash() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
 
 func Test_createMerkleTreeAsMatrix(t *testing.T) {
 	type args struct {
@@ -309,7 +285,7 @@ func Test_reconstructRootHash(t *testing.T) {
 		want string
 	}{
 		// TODO: Add test cases.
-		"test f1, with correct proofs, reconstruct correct rootHash": {
+		"test hash f1, with correct proofs, reconstruct correct rootHash": {
 			args{
 				hashFile: "0dffefeae189629164f222e18c83883c1fd9b5b02eb55d5ca99bd207ebcf882d", // f1
 				merkleProofs: []string{
@@ -319,7 +295,7 @@ func Test_reconstructRootHash(t *testing.T) {
 			},
 			"5880895435d8c5d8c8b549b520ef550882ab0245e1b241594c44ddffe5a6a8c0",
 		},
-		"test f1, with not correct proofs, reconstruct not correct rootHash": {
+		"test hash f1, with not correct proofs, reconstruct not correct rootHash": {
 			args{
 				hashFile: "0dffefeae189629164f222e18c83883c1fd9b5b02eb55d5ca99bd207ebcf882d", // f1
 				merkleProofs: []string{
@@ -376,6 +352,352 @@ func Test_isHashFileCorrect(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			if got := isHashFileCorrect(tt.args.hashFile, tt.args.merkleProofs, tt.args.wantedRootHash); got != tt.want {
 				t.Errorf("Verify() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestComputeMerkleTreeAsMatrix(t *testing.T) {
+	testFilesPath := "./testfiles"
+	files, err := os.ReadDir(testFilesPath)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	var fFiles []*os.File
+	for _, f := range files {
+		filePath := fmt.Sprintf("%s/%s", testFilesPath, f.Name())
+		ff, err := os.Open(filePath)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		fFiles = append(fFiles, ff)
+		defer ff.Close()
+	}
+
+	type args struct {
+		files []*os.File
+	}
+	tests := map[string]struct {
+		args    args
+		want    [][]string
+		wantErr bool
+	}{
+		// TODO: Add test cases.
+		"3 string hashes": {
+			args{
+				files: fFiles,
+			},
+			[][]string{
+				{"0dffefeae189629164f222e18c83883c1fd9b5b02eb55d5ca99bd207ebcf882d", "f8addeff4cc29a9a55589ae001e2230ecd7a515de5be7eeb27da1cabba87fbe6", "34575cdd0f12f999e0fc36ef7d70bbd5d302b9bca1a24a0712f505f490cf7a52", "34575cdd0f12f999e0fc36ef7d70bbd5d302b9bca1a24a0712f505f490cf7a52"},
+				{"26b28d79c60bda9bbec02d214d5defe3e21075276927239729cb2c01d9931acc", "dfa84bc707cd740d3551233bfda2cfa6df519d1e7e7174882efa7dc3cdab2286"},
+				{"5880895435d8c5d8c8b549b520ef550882ab0245e1b241594c44ddffe5a6a8c0"},
+			},
+			false,
+		},
+	}
+	for name, tt := range tests {
+		t.Run(name, func(t *testing.T) {
+			got, err := ComputeMerkleTreeAsMatrix(tt.args.files...)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("ComputeMerkleTreeAsMatrix() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("ComputeMerkleTreeAsMatrix() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+func TestComputeRootHash(t *testing.T) {
+	testFilesPath := "./testfiles"
+	files, err := os.ReadDir(testFilesPath)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	var fFiles []*os.File
+	for _, f := range files {
+		filePath := fmt.Sprintf("%s/%s", testFilesPath, f.Name())
+		ff, err := os.Open(filePath)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		fFiles = append(fFiles, ff)
+		defer ff.Close()
+	}
+
+	type args struct {
+		files []*os.File
+	}
+	tests := map[string]struct {
+		args    args
+		want    string
+		wantErr bool
+	}{
+		// TODO: Add test cases.
+		"3 string hashes": {
+			args{
+				files: fFiles,
+			},
+			"5880895435d8c5d8c8b549b520ef550882ab0245e1b241594c44ddffe5a6a8c0",
+			false,
+		},
+	}
+	for name, tt := range tests {
+		t.Run(name, func(t *testing.T) {
+			got, err := ComputeRootHash(tt.args.files...)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("ComputeMerkleTreeAsMatrix() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("ComputeMerkleTreeAsMatrix() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestComputeMerkleProof(t *testing.T) {
+	testFilesPath := "./testfiles"
+	files, err := os.ReadDir(testFilesPath)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	var fFiles []*os.File
+	for _, f := range files {
+		filePath := fmt.Sprintf("%s/%s", testFilesPath, f.Name())
+		ff, err := os.Open(filePath)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		fFiles = append(fFiles, ff)
+		defer ff.Close()
+	}
+
+	type args struct {
+		file       *os.File
+		merkleTree [][]string
+	}
+	tests := map[string]struct {
+		args args
+		want []string
+	}{
+		// TODO: Add test cases.
+		"find first file (f1)": {
+			args{
+				file: fFiles[0],
+				merkleTree: [][]string{
+					{"0dffefeae189629164f222e18c83883c1fd9b5b02eb55d5ca99bd207ebcf882d", "f8addeff4cc29a9a55589ae001e2230ecd7a515de5be7eeb27da1cabba87fbe6", "34575cdd0f12f999e0fc36ef7d70bbd5d302b9bca1a24a0712f505f490cf7a52", "34575cdd0f12f999e0fc36ef7d70bbd5d302b9bca1a24a0712f505f490cf7a52"},
+					{"26b28d79c60bda9bbec02d214d5defe3e21075276927239729cb2c01d9931acc", "dfa84bc707cd740d3551233bfda2cfa6df519d1e7e7174882efa7dc3cdab2286"},
+					{"5880895435d8c5d8c8b549b520ef550882ab0245e1b241594c44ddffe5a6a8c0"},
+				},
+			},
+			[]string{
+				"f8addeff4cc29a9a55589ae001e2230ecd7a515de5be7eeb27da1cabba87fbe6",
+				"dfa84bc707cd740d3551233bfda2cfa6df519d1e7e7174882efa7dc3cdab2286",
+			},
+		},
+		"find second file (f2)": {
+			args{
+				file: fFiles[1],
+				merkleTree: [][]string{
+					{"0dffefeae189629164f222e18c83883c1fd9b5b02eb55d5ca99bd207ebcf882d", "f8addeff4cc29a9a55589ae001e2230ecd7a515de5be7eeb27da1cabba87fbe6", "34575cdd0f12f999e0fc36ef7d70bbd5d302b9bca1a24a0712f505f490cf7a52", "34575cdd0f12f999e0fc36ef7d70bbd5d302b9bca1a24a0712f505f490cf7a52"},
+					{"26b28d79c60bda9bbec02d214d5defe3e21075276927239729cb2c01d9931acc", "dfa84bc707cd740d3551233bfda2cfa6df519d1e7e7174882efa7dc3cdab2286"},
+					{"5880895435d8c5d8c8b549b520ef550882ab0245e1b241594c44ddffe5a6a8c0"},
+				},
+			},
+			[]string{
+				"0dffefeae189629164f222e18c83883c1fd9b5b02eb55d5ca99bd207ebcf882d",
+				"dfa84bc707cd740d3551233bfda2cfa6df519d1e7e7174882efa7dc3cdab2286",
+			},
+		},
+		"find third file (f3)": {
+			args{
+				file: fFiles[2],
+				merkleTree: [][]string{
+					{"0dffefeae189629164f222e18c83883c1fd9b5b02eb55d5ca99bd207ebcf882d", "f8addeff4cc29a9a55589ae001e2230ecd7a515de5be7eeb27da1cabba87fbe6", "34575cdd0f12f999e0fc36ef7d70bbd5d302b9bca1a24a0712f505f490cf7a52", "34575cdd0f12f999e0fc36ef7d70bbd5d302b9bca1a24a0712f505f490cf7a52"},
+					{"26b28d79c60bda9bbec02d214d5defe3e21075276927239729cb2c01d9931acc", "dfa84bc707cd740d3551233bfda2cfa6df519d1e7e7174882efa7dc3cdab2286"},
+					{"5880895435d8c5d8c8b549b520ef550882ab0245e1b241594c44ddffe5a6a8c0"},
+				},
+			},
+			[]string{
+				"34575cdd0f12f999e0fc36ef7d70bbd5d302b9bca1a24a0712f505f490cf7a52",
+				"26b28d79c60bda9bbec02d214d5defe3e21075276927239729cb2c01d9931acc",
+			},
+		},
+		"find fourth file (f4) - not found": {
+			args{
+				file: fFiles[2],
+				merkleTree: [][]string{
+					{"0dffefeae189629164f222e18c83883c1fd9b5b02eb55d5ca99bd207ebcf882d", "f8addeff4cc29a9a55589ae001e2230ecd7a515de5be7eeb27da1cabba87fbe6", "34575cdd0f12f999e0fc36ef7d70bbd5d302b9bca1a24a0712f505f490cf7a52", "34575cdd0f12f999e0fc36ef7d70bbd5d302b9bca1a24a0712f505f490cf7a52"},
+					{"26b28d79c60bda9bbec02d214d5defe3e21075276927239729cb2c01d9931acc", "dfa84bc707cd740d3551233bfda2cfa6df519d1e7e7174882efa7dc3cdab2286"},
+					{"5880895435d8c5d8c8b549b520ef550882ab0245e1b241594c44ddffe5a6a8c0"},
+				},
+			},
+			[]string{},
+		},
+	}
+
+	for name, tt := range tests {
+		t.Run(name, func(t *testing.T) {
+			if got := ComputeMerkleProof(tt.args.file, tt.args.merkleTree); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("ComputeMerkleProof() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestReconstructRootHash(t *testing.T) {
+	testFilesPath := "./testfiles"
+	files, err := os.ReadDir(testFilesPath)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	var fFiles []*os.File
+	for _, f := range files {
+		filePath := fmt.Sprintf("%s/%s", testFilesPath, f.Name())
+		ff, err := os.Open(filePath)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		fFiles = append(fFiles, ff)
+		defer ff.Close()
+	}
+
+	type args struct {
+		file         *os.File
+		merkleProofs []string
+	}
+	tests := map[string]struct {
+		args    args
+		want    string
+		wantErr bool
+	}{
+		// TODO: Add test cases.
+		"test f1, with correct proofs, reconstruct correct rootHash": {
+			args{
+				file: fFiles[0],
+				merkleProofs: []string{
+					"f8addeff4cc29a9a55589ae001e2230ecd7a515de5be7eeb27da1cabba87fbe6",
+					"dfa84bc707cd740d3551233bfda2cfa6df519d1e7e7174882efa7dc3cdab2286",
+				},
+			},
+			"5880895435d8c5d8c8b549b520ef550882ab0245e1b241594c44ddffe5a6a8c0",
+			false,
+		},
+		"test f2, with correct proofs, reconstruct correct rootHash": {
+			args{
+				file: fFiles[1],
+				merkleProofs: []string{
+					"0dffefeae189629164f222e18c83883c1fd9b5b02eb55d5ca99bd207ebcf882d",
+					"dfa84bc707cd740d3551233bfda2cfa6df519d1e7e7174882efa7dc3cdab2286",
+				},
+			},
+			"5880895435d8c5d8c8b549b520ef550882ab0245e1b241594c44ddffe5a6a8c0",
+			false,
+		},
+		"test f3, with correct proofs, reconstruct correct rootHash": {
+			args{
+				file: fFiles[2],
+				merkleProofs: []string{
+					"34575cdd0f12f999e0fc36ef7d70bbd5d302b9bca1a24a0712f505f490cf7a52",
+					"26b28d79c60bda9bbec02d214d5defe3e21075276927239729cb2c01d9931acc",
+				},
+			},
+			"5880895435d8c5d8c8b549b520ef550882ab0245e1b241594c44ddffe5a6a8c0",
+			false,
+		},
+	}
+	for name, tt := range tests {
+		t.Run(name, func(t *testing.T) {
+			got, err := ReconstructRootHash(tt.args.file, tt.args.merkleProofs)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("ReconstructRootHash() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
+				t.Errorf("ReconstructRootHash() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestIsFileCorrect(t *testing.T) {
+	testFilesPath := "./testfiles"
+	files, err := os.ReadDir(testFilesPath)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	var fFiles []*os.File
+	for _, f := range files {
+		filePath := fmt.Sprintf("%s/%s", testFilesPath, f.Name())
+		ff, err := os.Open(filePath)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		fFiles = append(fFiles, ff)
+		defer ff.Close()
+	}
+
+	type args struct {
+		file           *os.File
+		merkleProofs   []string
+		wantedRootHash string
+	}
+	tests := map[string]struct {
+		args    args
+		want    bool
+		wantErr bool
+	}{
+		// TODO: Add test cases.
+		"test f1, with correct proofs, return true": {
+			args{
+				file: fFiles[0],
+				merkleProofs: []string{
+					"f8addeff4cc29a9a55589ae001e2230ecd7a515de5be7eeb27da1cabba87fbe6",
+					"dfa84bc707cd740d3551233bfda2cfa6df519d1e7e7174882efa7dc3cdab2286",
+				},
+				wantedRootHash: "5880895435d8c5d8c8b549b520ef550882ab0245e1b241594c44ddffe5a6a8c0",
+			},
+			true,
+			false,
+		},
+		"test f1, with not correct proofs, return false": {
+			args{
+				file: fFiles[0],
+				merkleProofs: []string{
+					"f9addeff4cc29a9a55589ae001e2230ecd7a515de5be7eeb27da1cabba87fbe6",
+					"dfa84bc707cd740d3551233bfda2cfa6df519d1e7e7174882efa7dc3cdab2286",
+				},
+				wantedRootHash: "5880895435d8c5d8c8b549b520ef550882ab0245e1b241594c44ddffe5a6a8c0",
+			},
+			false,
+			false,
+		},
+	}
+	for name, tt := range tests {
+		t.Run(name, func(t *testing.T) {
+			got, err := IsFileCorrect(tt.args.file, tt.args.merkleProofs, tt.args.wantedRootHash)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("IsFileCorrect() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
+				t.Errorf("IsFileCorrect() = %v, want %v", got, tt.want)
 			}
 		})
 	}
