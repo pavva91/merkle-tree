@@ -13,20 +13,17 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/pavva91/merkle-tree/libs/merkletree"
 	"github.com/pavva91/merkle-tree/server/config"
-	"github.com/pavva91/merkle-tree/server/internal/errorhandlers"
 )
 
 type filesHandler struct{}
 
 var (
-	FilesHandler     = filesHandler{}
+	FilesHandler = filesHandler{}
+	// TODO: refactor: use models package
 	MerkleTreeMatrix = [][]string{}
 )
 
-// TODO: Use configs (file and envvars)
-// const MAX_BULK_UPLOAD_SIZE = 32 << 20 // 32 MB
-// const MAX_UPLOAD_FILE_SIZE = 2 * 1024 * 1024 // 2MB
-// const UPLOAD_FOLDER = "./uploads"
+// TODO: Refactor code (handlers, services)
 
 // Bulk Upload godoc
 //
@@ -40,14 +37,9 @@ var (
 //	@Failure		500		{object}	string
 //	@Router			/files [post]
 func (h filesHandler) BulkUpload(w http.ResponseWriter, r *http.Request) {
-	// TODO: if it is just one file merkle tree will simply be the file hash
-
-	// 32 MB is the default used by FormFile()
-	// MAX_BULK_UPLOAD_SIZE := 32 << 20
-	fmt.Println("MAX BULK UPLOAD SIZE", config.Values.Server.MaxBulkUploadSize)
-	fmt.Println("MAX FILE UPLOAD SIZE", config.Values.Server.MaxUploadFileSize)
+	// TODO: move fs interaction in "services" package
 	if err := r.ParseMultipartForm(int64(config.Values.Server.MaxBulkUploadSize)); err != nil {
-		errorhandlers.BadRequestHandler(w, r, errors.New("The uploaded bulk files are too big."))
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
@@ -69,10 +61,6 @@ func (h filesHandler) BulkUpload(w http.ResponseWriter, r *http.Request) {
 
 	var rFiles []*os.File
 	for k, fileHeader := range files {
-		// Restrict the size of each uploaded file to 1MB.
-		// To prevent the aggregate size from exceeding
-		// a specified value, use the http.MaxBytesReader() method
-		// before calling ParseMultipartForm()
 		if fileHeader.Size > int64(config.Values.Server.MaxUploadFileSize) {
 			http.Error(w, fmt.Sprintf("The uploaded image is too big: %s. Please use an image less than 1MB in size", fileHeader.Filename), http.StatusBadRequest)
 			return
@@ -129,7 +117,7 @@ func (h filesHandler) BulkUpload(w http.ResponseWriter, r *http.Request) {
 	// TODO: 1. Save in memory
 	MerkleTreeMatrix, err = merkletree.ComputeMerkleTreeAsMatrix(rFiles...)
 	if err != nil {
-		errorhandlers.InternalServerErrorHandler(w, r)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
@@ -150,10 +138,12 @@ func (h filesHandler) BulkUpload(w http.ResponseWriter, r *http.Request) {
 //	@Failure		500		{object}	string
 //	@Router			/files/{filename} [get]
 func (h filesHandler) DownloadByName(w http.ResponseWriter, r *http.Request) {
-	// TODO: Validation
+	// TODO: move fs interaction in "services" package
+
 	if len(MerkleTreeMatrix) == 0 {
-		log.Println("no merkle tree, upload files first")
-		errorhandlers.BadRequestHandler(w, r, errors.New("no merkle tree, upload files first"))
+		err := errors.New("no merkle tree, upload files first")
+		log.Println(err.Error())
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
@@ -189,18 +179,19 @@ func (h filesHandler) DownloadByName(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(foundFilePath)
 	fileBytes, err := os.ReadFile(foundFilePath)
 	if err != nil {
-		errorhandlers.NotFoundHandler(w, r, errors.New("file not found"))
+		err = errors.New("file not found")
+		http.Error(w, err.Error(), http.StatusNotFound)
 		return
 	}
 
 	file, err := os.Open(foundFilePath)
 	if err != nil {
 		fmt.Println(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	defer file.Close()
 
-	// TODO: retrieve merkletree from DB
 	merkleProofs := merkletree.ComputeMerkleProof(file, MerkleTreeMatrix)
 	mps := fmt.Sprintf("%+q", merkleProofs)
 	w.Header().Add("Merkle-Proof", mps)
@@ -208,9 +199,4 @@ func (h filesHandler) DownloadByName(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/octet-stream")
 	w.Write(fileBytes)
-	// http.ServeFile(w, r, "./uploads/*_f1")
-	// fmt.Fprintf(w, "Download successful")
-	// TODO: return: file, merkle proofs
-	// File: Content-Type: application/octet-stream
-	// Merkle Proof: array on header
 }

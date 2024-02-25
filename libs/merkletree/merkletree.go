@@ -10,6 +10,7 @@ import (
 	"strings"
 )
 
+// TODO: Test with real files (./testfiles/)
 // TODO: Check go docs best practices
 
 // IsFileCorrect if the file is correct and is not tampered.
