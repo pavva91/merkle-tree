@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strconv"
 	"time"
 
 	"gopkg.in/yaml.v2"
@@ -50,11 +51,23 @@ func main() {
 	)).Methods(http.MethodGet)
 
 	useEnvVar := os.Getenv("USE_ENVVAR")
-	log.Printf("Using envvar value, must be USE_ENVVAR=\"true\" to run with environment variable, otherwise will use config file by default: %s", useEnvVar)
+	log.Printf("Using envvar value: %s\n", useEnvVar)
+	log.Println("must be USE_ENVVAR=\"true\" to run with environment variable, otherwise will use a config file by default")
 
 	if useEnvVar == "true" {
 		config.Values.Server.Host = os.Getenv("SERVER_HOST")
 		config.Values.Server.Port = os.Getenv("SERVER_PORT")
+		bulkUploadMaxSize, err := strconv.Atoi(os.Getenv("MAX_BULK_UPLOAD_SIZE"))
+		if err != nil {
+			log.Panicf("insert int value for max size of bulk upload")
+		}
+		config.Values.Server.MaxBulkUploadSize = bulkUploadMaxSize
+		fileUploadMaxSize, err := strconv.Atoi(os.Getenv("MAX_UPLOAD_FILE_SIZE"))
+		if err != nil {
+			log.Panicf("insert int value for max size of file upload")
+		}
+		config.Values.Server.MaxUploadFileSize = fileUploadMaxSize
+		config.Values.Server.UploadFolder = os.Getenv("UPLOAD_FOLDER")
 	} else {
 		env := os.Getenv("SERVER_ENVIRONMENT")
 
@@ -73,18 +86,7 @@ func main() {
 		}
 	}
 
-	// connect to db
-	// db.ORM.MustConnectToDB(config.ServerConfigValues)
-	// err := db.ORM.GetDB().AutoMigrate(
-	// &models.File{},
-	// )
-	// if err != nil {
-	// 	log.Panicln("error retrieving DB")
-	// 	return
-	// }
-
 	// run the server
-	fmt.Printf("Server is running on host %s\n", config.Values.Server.Host)
 	fmt.Printf("Server is running on port %s\n", config.Values.Server.Port)
 	// addr := fmt.Sprint("127.0.0.1:" + config.ServerConfigValues.Server.Port)
 	// addr := fmt.Sprint("0.0.0.0:" + config.ServerConfigValues.Server.Port)

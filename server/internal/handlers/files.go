@@ -12,6 +12,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/pavva91/merkle-tree/libs/merkletree"
+	"github.com/pavva91/merkle-tree/server/config"
 	"github.com/pavva91/merkle-tree/server/internal/errorhandlers"
 )
 
@@ -23,8 +24,9 @@ var (
 )
 
 // TODO: Use configs (file and envvars)
-const MAX_UPLOAD_SIZE = 2 * 1024 * 1024 // 2MB
-const UPLOAD_FOLDER = "./uploads"
+// const MAX_BULK_UPLOAD_SIZE = 32 << 20 // 32 MB
+// const MAX_UPLOAD_FILE_SIZE = 2 * 1024 * 1024 // 2MB
+// const UPLOAD_FOLDER = "./uploads"
 
 // Bulk Upload godoc
 //
@@ -41,7 +43,10 @@ func (h filesHandler) BulkUpload(w http.ResponseWriter, r *http.Request) {
 	// TODO: if it is just one file merkle tree will simply be the file hash
 
 	// 32 MB is the default used by FormFile()
-	if err := r.ParseMultipartForm(32 << 20); err != nil {
+	// MAX_BULK_UPLOAD_SIZE := 32 << 20
+	fmt.Println("MAX BULK UPLOAD SIZE", config.Values.Server.MaxBulkUploadSize)
+	fmt.Println("MAX FILE UPLOAD SIZE", config.Values.Server.MaxUploadFileSize)
+	if err := r.ParseMultipartForm(int64(config.Values.Server.MaxBulkUploadSize)); err != nil {
 		errorhandlers.BadRequestHandler(w, r, errors.New("The uploaded bulk files are too big."))
 		return
 	}
@@ -50,13 +55,13 @@ func (h filesHandler) BulkUpload(w http.ResponseWriter, r *http.Request) {
 	// They are accessible only after ParseMultipartForm is called
 	files := r.MultipartForm.File["file"]
 
-	err := os.RemoveAll(UPLOAD_FOLDER)
+	err := os.RemoveAll(config.Values.Server.UploadFolder)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	err = os.MkdirAll(UPLOAD_FOLDER, os.ModePerm)
+	err = os.MkdirAll(config.Values.Server.UploadFolder, os.ModePerm)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -68,7 +73,7 @@ func (h filesHandler) BulkUpload(w http.ResponseWriter, r *http.Request) {
 		// To prevent the aggregate size from exceeding
 		// a specified value, use the http.MaxBytesReader() method
 		// before calling ParseMultipartForm()
-		if fileHeader.Size > MAX_UPLOAD_SIZE {
+		if fileHeader.Size > int64(config.Values.Server.MaxUploadFileSize) {
 			http.Error(w, fmt.Sprintf("The uploaded image is too big: %s. Please use an image less than 1MB in size", fileHeader.Filename), http.StatusBadRequest)
 			return
 		}
@@ -95,7 +100,7 @@ func (h filesHandler) BulkUpload(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		// TODO: add client identifier (to handle multiple clients)
-		fileName := fmt.Sprintf("%s/%d_%d_%s", UPLOAD_FOLDER, k+1, time.Now().UnixNano(), fileHeader.Filename)
+		fileName := fmt.Sprintf("%s/%d_%d_%s", config.Values.Server.UploadFolder, k+1, time.Now().UnixNano(), fileHeader.Filename)
 		f, err := os.Create(fileName)
 		// f, err := os.Create(fmt.Sprintf("./uploads/%d_%d_%s", k+1, time.Now().UnixNano(), fileHeader.Filename))
 		if err != nil {
@@ -157,7 +162,7 @@ func (h filesHandler) DownloadByName(w http.ResponseWriter, r *http.Request) {
 
 	filename := fileName
 
-	dir, err := os.Open(UPLOAD_FOLDER)
+	dir, err := os.Open(config.Values.Server.UploadFolder)
 	if err != nil {
 		fmt.Println("Error opening directory:", err)
 		return
@@ -170,7 +175,7 @@ func (h filesHandler) DownloadByName(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	foundFilePath := UPLOAD_FOLDER + "/"
+	foundFilePath := config.Values.Server.UploadFolder + "/"
 
 	for _, file := range files {
 		ss := strings.SplitAfter(file.Name(), "_")
