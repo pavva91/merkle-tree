@@ -5,7 +5,6 @@ WORKDIR /root/app
 COPY ./libs ./libs/
 COPY ./client ./client/
 
-# WORKDIR /usr/src/app/client
 WORKDIR /root/app/client
 
 RUN go mod download && go mod verify

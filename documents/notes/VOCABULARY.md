@@ -1,4 +1,5 @@
 # Vocabulary
+
 A Merkle tree is a non-linear, binary, hash tree-like data structure.
 Each leaf node of the tree stores the hash value of a data element.
 Calculate Merkle Tree 4 files:
@@ -18,8 +19,6 @@ The main difference from a hash list is that one branch of the hash tree can be 
 
 ## Odd merkle tree
 
-https://bitcoin.stackexchange.com/questions/46767/merkle-tree-structure-for-9-transactions
-https://bitcoin.stackexchange.com/questions/79364/are-number-of-transactions-in-merkle-tree-always-even
 Merkle Tree := Is a binary tree where each node is a hash over its child nodes.
 If there are an odd number of nodes on any level of the merkle tree, the last node is duplicated and hashed with itself.
 If there were a Tx4 (fith element), the diagram would look like this:
@@ -33,10 +32,11 @@ If there were a Tx4 (fith element), the diagram would look like this:
    /   \        /   \             /   \
 Hash0  Hash1  Hash2  Hash3     Hash4   Hash4
 ```
+
 ```bash
                             ROOT
-                            /  \   
-                         /        \  
+                            /  \
+                         /        \
                       /              \
                    /                    \
                z1                            z2
@@ -47,8 +47,11 @@ Hash0  Hash1  Hash2  Hash3     Hash4   Hash4
      /  \            /  \           / \
    /      \        /      \       /     \
   x1      x2      x3      x4     x5    x5
- / \     / \     / \     / \     / \ 
+ / \     / \     / \     / \     / \
 a   b   c   d   e   f   g   h   i   i
 ```
 
 The merkle root (root hash in the diagram) is stored. That is the only hash stored. It is a fixed size, regardless of the rest of the merkle tree. The hashes in the merkle tree are not stored.
+
+[source 1](https://bitcoin.stackexchange.com/questions/46767/merkle-tree-structure-for-9-transactions)
+[source 2](https://bitcoin.stackexchange.com/questions/79364/are-number-of-transactions-in-merkle-tree-always-even)

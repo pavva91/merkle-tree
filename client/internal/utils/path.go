@@ -9,11 +9,7 @@ import (
 
 func DirPathIsValid(dirPath string) bool {
 	_, err := os.ReadDir(dirPath)
-	if err != nil {
-		return false
-	}
-
-	return true
+	return err == nil
 }
 
 func PathValidation(dirPath string) (string, error) {
@@ -32,7 +28,7 @@ func PathValidation(dirPath string) (string, error) {
 		dirPath = home + dirPath[1:]
 	}
 	if !DirPathIsValid(dirPath) {
-		err := errors.New(fmt.Sprintf("folder %s does not exist", dirPath))
+		err := fmt.Errorf("folder %s does not exist", dirPath)
 		return "", err
 	}
 	return dirPath, nil

@@ -122,7 +122,7 @@ func (h filesHandler) BulkUpload(w http.ResponseWriter, r *http.Request) {
 	}
 
 	fmt.Println("merkle-root of created merkle tree", MerkleTreeMatrix[len(MerkleTreeMatrix)-1][0])
-	fmt.Fprintf(w, "Upload successful")
+	fmt.Fprintf(w, "upload successful")
 }
 
 // Download godoc
@@ -154,24 +154,27 @@ func (h filesHandler) DownloadByName(w http.ResponseWriter, r *http.Request) {
 
 	dir, err := os.Open(config.Values.Server.UploadFolder)
 	if err != nil {
-		fmt.Println("Error opening directory:", err)
+		fmt.Println("error opening directory:", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	defer dir.Close()
 
 	files, err := dir.Readdir(-1)
 	if err != nil {
-		fmt.Println("Error reading directory:", err)
+		fmt.Println("error reading directory:", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	foundFilePath := config.Values.Server.UploadFolder + "/"
+	foundFilePath := config.Values.Server.UploadFolder
 
-	for _, file := range files {
-		ss := strings.SplitAfter(file.Name(), "_")
+	for k, f := range files {
+		ss := strings.SplitAfter(f.Name(), "_")
 		if ss[len(ss)-1] == filename {
-			fmt.Println("File found:", file.Name())
-			foundFilePath = foundFilePath + file.Name()
+			fmt.Printf("file %v found: %s\n", k+1, f.Name())
+			// foundFilePath = foundFilePath + "/" + f.Name()
+			foundFilePath = fmt.Sprintf("%s/%s", foundFilePath, f.Name())
 		}
 	}
 
@@ -198,5 +201,9 @@ func (h filesHandler) DownloadByName(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/octet-stream")
-	w.Write(fileBytes)
+	_, err = w.Write(fileBytes)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 }

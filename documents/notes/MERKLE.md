@@ -1,5 +1,4 @@
 # GENERAL WORKFLOW
-https://github.com/cbergoon/merkletree/blob/master/merkle_tree.go
 
 1. Client computes Merkle Tree root hash
 2. Client batch upload of files (F0, F1, ..., Fn) into the server
@@ -15,13 +14,15 @@ https://github.com/cbergoon/merkletree/blob/master/merkle_tree.go
 
 1. Compute hash of each file (H(F0), H(F1), ..., H(Fn))
 2. Compute hash of hashes of couples of H(i)-H(i+1)
-  - Merkle tree is a slice of slice (n x m)
-    - n := number of files
-    - m := depth of the tree
-    - len(merkleTree[0]) ~~> n
-    - len(merkleTree[1]) ~~> n/2
-    - len(merkleTree[m-1]) --> 1 (root hash)
-    - Note: at each level, if the number of elements is odd you duplicate the last element
+
+- Merkle tree is a slice of slice (n x m)
+  - n := number of files
+  - m := depth of the tree
+  - len(merkleTree[0]) ~~> n
+  - len(merkleTree[1]) ~~> n/2
+  - len(merkleTree[m-1]) --> 1 (root hash)
+  - Note: at each level, if the number of elements is odd you duplicate the last element
+
 3. Reiterate step 2. until you end up into the root hash (no couples)
 
 ## Open Questions
@@ -134,5 +135,5 @@ At each level of the tree, if you have odd elements, you just duplicate the last
 
 - If it's odd (at each level of the tree) -> duplicate last element at that level
 - if len(merkleTree[i])/2 != 0 {
-    merkleTree.append(merkleTree(len -1) )
+  merkleTree.append(merkleTree(len -1) )
   }

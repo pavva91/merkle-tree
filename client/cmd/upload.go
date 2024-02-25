@@ -107,6 +107,10 @@ var uploadCmd = &cobra.Command{
 			defer file2.Close()
 
 			part, err := writer.CreateFormFile("file", filepath.Base(filePath))
+			if err != nil {
+				fmt.Println(err)
+				return
+			}
 			_, err = io.Copy(part, file)
 			if err != nil {
 				fmt.Println(err)
@@ -146,20 +150,23 @@ var uploadCmd = &cobra.Command{
 		fmt.Println("server response:", string(body))
 
 		rootHash, err := merkletree.ComputeRootHash(rFiles...)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
 
 		rootHashPath := fmt.Sprintf("%s/%s", storageFolder, "root-hash")
 		err = os.WriteFile(rootHashPath, []byte(rootHash), 0666)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
 		fmt.Println("root hash stored in:", rootHashPath)
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(uploadCmd)
-
-	// viper.SetDefault("DEFAULT_STORAGE_FOLDER", "./storage")
-	// viper.SetDefault("DEFAULT_UPLOAD_FOLDER", "./testfiles")
-	// viper.SetDefault("DEFAULT_DOWNLOAD_FOLDER", "./downloads")
-	// viper.SetDefault("SERVER_URL", "http://localhost:8080")
 
 	// Here you will define your flags and configuration settings.
 
