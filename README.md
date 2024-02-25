@@ -2,11 +2,11 @@
 
 [![Go](https://github.com/pavva91/merkle-tree/actions/workflows/go.yml/badge.svg)](https://github.com/pavva91/merkle-tree/actions/workflows/go.yml)
 
-[![Merkle Tree Library](https://goreportcard.com/badge/github.com/pavva91/merkle-tree/libs/merkletree)](https://goreportcard.com/report/github.com/pavva91/merkle-tree/libs/merkletree)
+Merkle Tree Library: [![Merkle Tree Library](https://goreportcard.com/badge/github.com/pavva91/merkle-tree/libs/merkletree)](https://goreportcard.com/report/github.com/pavva91/merkle-tree/libs/merkletree)
 
-[![Server](https://goreportcard.com/badge/github.com/pavva91/merkle-tree/server)](https://goreportcard.com/report/github.com/pavva91/merkle-tree/server)
+Server: [![Server](https://goreportcard.com/badge/github.com/pavva91/merkle-tree/server)](https://goreportcard.com/report/github.com/pavva91/merkle-tree/server)
 
-[![Client](https://goreportcard.com/badge/github.com/pavva91/merkle-tree/client)](https://goreportcard.com/report/github.com/pavva91/merkle-tree/client)
+Client: [![Client](https://goreportcard.com/badge/github.com/pavva91/merkle-tree/client)](https://goreportcard.com/report/github.com/pavva91/merkle-tree/client)
 
 ## Description
 
