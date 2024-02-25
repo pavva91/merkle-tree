@@ -29,6 +29,12 @@ const docTemplate = `{
                 ],
                 "summary": "List",
                 "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ListFilesResponse"
+                        }
+                    },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
@@ -131,6 +137,19 @@ const docTemplate = `{
                         "schema": {
                             "type": "string"
                         }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "dto.ListFilesResponse": {
+            "type": "object",
+            "properties": {
+                "filenames": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
                     }
                 }
             }

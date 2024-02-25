@@ -35,7 +35,7 @@ var (
 //	@Tags			Files
 //	@Accept			multipart/form-data
 //	@Produce		text/plain
-//	@Param			file	formData		[]file	true	"files to upload"
+//	@Param			file	formData	[]file	true	"files to upload"
 //	@Failure		400		{object}	string
 //	@Failure		500		{object}	string
 //	@Router			/files [post]
@@ -136,9 +136,9 @@ func (h filesHandler) BulkUpload(w http.ResponseWriter, r *http.Request) {
 //	@Accept			json
 //	@Produce		json
 //	@Param			filename	path		string	true	"File Name"	Format(string)
-//	@Failure		400		{object}	string
-//	@Failure		404		{object}	string
-//	@Failure		500		{object}	string
+//	@Failure		400			{object}	string
+//	@Failure		404			{object}	string
+//	@Failure		500			{object}	string
 //	@Router			/files/{filename} [get]
 func (h filesHandler) DownloadByName(w http.ResponseWriter, r *http.Request) {
 	// TODO: move fs interaction in "services" package
@@ -218,9 +218,10 @@ func (h filesHandler) DownloadByName(w http.ResponseWriter, r *http.Request) {
 //	@Tags			Files
 //	@Accept			json
 //	@Produce		json
-//	@Failure		400		{object}	string
-//	@Failure		404		{object}	string
-//	@Failure		500		{object}	string
+//	@Success		200	{object}	dto.ListFilesResponse
+//	@Failure		400	{object}	string
+//	@Failure		404	{object}	string
+//	@Failure		500	{object}	string
 //	@Router			/files [get]
 func (h filesHandler) ListNames(w http.ResponseWriter, r *http.Request) {
 	if len(MerkleTreeMatrix) == 0 {

@@ -1,3 +1,11 @@
+definitions:
+  dto.ListFilesResponse:
+    properties:
+      filenames:
+        items:
+          type: string
+        type: array
+    type: object
 host: localhost:8080
 info:
   contact: {}
@@ -14,6 +22,10 @@ paths:
       produces:
       - application/json
       responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ListFilesResponse'
         "400":
           description: Bad Request
           schema:
