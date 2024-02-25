@@ -115,7 +115,6 @@ func Test_createMerkleProof(t *testing.T) {
 		args args
 		want []string
 	}{
-		// TODO: Add test cases.
 		"2 string hashes, not found": {
 			args{
 				merkleTree: [][]string{
@@ -150,7 +149,22 @@ func Test_createMerkleProof(t *testing.T) {
 			},
 			[]string{},
 		},
-		"3 string hashes, found": {
+		"3 string hashes, found f1": {
+			args{
+				merkleTree: [][]string{
+					{"0dffefeae189629164f222e18c83883c1fd9b5b02eb55d5ca99bd207ebcf882d", "f8addeff4cc29a9a55589ae001e2230ecd7a515de5be7eeb27da1cabba87fbe6", "34575cdd0f12f999e0fc36ef7d70bbd5d302b9bca1a24a0712f505f490cf7a52", "34575cdd0f12f999e0fc36ef7d70bbd5d302b9bca1a24a0712f505f490cf7a52"},
+					{"26b28d79c60bda9bbec02d214d5defe3e21075276927239729cb2c01d9931acc", "dfa84bc707cd740d3551233bfda2cfa6df519d1e7e7174882efa7dc3cdab2286"},
+					{"5880895435d8c5d8c8b549b520ef550882ab0245e1b241594c44ddffe5a6a8c0"},
+				},
+
+				hashFile: "0dffefeae189629164f222e18c83883c1fd9b5b02eb55d5ca99bd207ebcf882d", // f1
+			},
+			[]string{
+				"f8addeff4cc29a9a55589ae001e2230ecd7a515de5be7eeb27da1cabba87fbe6",
+				"dfa84bc707cd740d3551233bfda2cfa6df519d1e7e7174882efa7dc3cdab2286",
+			},
+		},
+		"3 string hashes, found f2": {
 			args{
 				merkleTree: [][]string{
 					{"0dffefeae189629164f222e18c83883c1fd9b5b02eb55d5ca99bd207ebcf882d", "f8addeff4cc29a9a55589ae001e2230ecd7a515de5be7eeb27da1cabba87fbe6", "34575cdd0f12f999e0fc36ef7d70bbd5d302b9bca1a24a0712f505f490cf7a52", "34575cdd0f12f999e0fc36ef7d70bbd5d302b9bca1a24a0712f505f490cf7a52"},
@@ -163,6 +177,21 @@ func Test_createMerkleProof(t *testing.T) {
 			[]string{
 				"0dffefeae189629164f222e18c83883c1fd9b5b02eb55d5ca99bd207ebcf882d",
 				"dfa84bc707cd740d3551233bfda2cfa6df519d1e7e7174882efa7dc3cdab2286",
+			},
+		},
+		"3 string hashes, found f3": {
+			args{
+				merkleTree: [][]string{
+					{"0dffefeae189629164f222e18c83883c1fd9b5b02eb55d5ca99bd207ebcf882d", "f8addeff4cc29a9a55589ae001e2230ecd7a515de5be7eeb27da1cabba87fbe6", "34575cdd0f12f999e0fc36ef7d70bbd5d302b9bca1a24a0712f505f490cf7a52", "34575cdd0f12f999e0fc36ef7d70bbd5d302b9bca1a24a0712f505f490cf7a52"},
+					{"26b28d79c60bda9bbec02d214d5defe3e21075276927239729cb2c01d9931acc", "dfa84bc707cd740d3551233bfda2cfa6df519d1e7e7174882efa7dc3cdab2286"},
+					{"5880895435d8c5d8c8b549b520ef550882ab0245e1b241594c44ddffe5a6a8c0"},
+				},
+
+				hashFile: "34575cdd0f12f999e0fc36ef7d70bbd5d302b9bca1a24a0712f505f490cf7a52", // f3
+			},
+			[]string{
+				"34575cdd0f12f999e0fc36ef7d70bbd5d302b9bca1a24a0712f505f490cf7a52",
+				"26b28d79c60bda9bbec02d214d5defe3e21075276927239729cb2c01d9931acc",
 			},
 		},
 		"5 string hashes, found h2": {
@@ -217,6 +246,136 @@ func Test_createMerkleProof(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			if got := createMerkleProof(tt.args.hashFile, tt.args.merkleTree); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("createMerkleProof() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_calculateHashPair(t *testing.T) {
+	type args struct {
+		h1 string
+		h2 string
+	}
+	tests := map[string]struct {
+		args args
+		want string
+	}{
+		// TODO: Add test cases.
+		"test reverse (ascii code) order": {
+			args{
+				h1: "aaaa",
+				h2: "bbbb",
+			},
+			"bbbbaaaa",
+		},
+		"test in correct (ascii code) order": {
+			args{
+				h1: "bbbb",
+				h2: "aaaa",
+			},
+			"bbbbaaaa",
+		},
+		"test in order, real hash": {
+			args{
+				h1: "f8addeff4cc29a9a55589ae001e2230ecd7a515de5be7eeb27da1cabba87fbe6",
+				h2: "0dffefeae189629164f222e18c83883c1fd9b5b02eb55d5ca99bd207ebcf882d",
+			},
+			"f8addeff4cc29a9a55589ae001e2230ecd7a515de5be7eeb27da1cabba87fbe60dffefeae189629164f222e18c83883c1fd9b5b02eb55d5ca99bd207ebcf882d",
+		},
+		"test reverse order, real hash": {
+			args{
+				h1: "0dffefeae189629164f222e18c83883c1fd9b5b02eb55d5ca99bd207ebcf882d",
+				h2: "f8addeff4cc29a9a55589ae001e2230ecd7a515de5be7eeb27da1cabba87fbe6",
+			},
+			"f8addeff4cc29a9a55589ae001e2230ecd7a515de5be7eeb27da1cabba87fbe60dffefeae189629164f222e18c83883c1fd9b5b02eb55d5ca99bd207ebcf882d",
+		},
+	}
+	for name, tt := range tests {
+		t.Run(name, func(t *testing.T) {
+			if got := calculateHashPair(tt.args.h1, tt.args.h2); got != tt.want {
+				t.Errorf("calculateHashPair() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_reconstructRootHash(t *testing.T) {
+	type args struct {
+		hashFile     string
+		merkleProofs []string
+	}
+	tests := map[string]struct {
+		args args
+		want string
+	}{
+		// TODO: Add test cases.
+		"test f1, with correct proofs, reconstruct correct rootHash": {
+			args{
+				hashFile: "0dffefeae189629164f222e18c83883c1fd9b5b02eb55d5ca99bd207ebcf882d", // f1
+				merkleProofs: []string{
+					"f8addeff4cc29a9a55589ae001e2230ecd7a515de5be7eeb27da1cabba87fbe6",
+					"dfa84bc707cd740d3551233bfda2cfa6df519d1e7e7174882efa7dc3cdab2286",
+				},
+			},
+			"5880895435d8c5d8c8b549b520ef550882ab0245e1b241594c44ddffe5a6a8c0",
+		},
+		"test f1, with not correct proofs, reconstruct not correct rootHash": {
+			args{
+				hashFile: "0dffefeae189629164f222e18c83883c1fd9b5b02eb55d5ca99bd207ebcf882d", // f1
+				merkleProofs: []string{
+					"f8addeff4cc29a9a55589ae001e2230ecd7a515de5be7eeb27da1cabba87fbe7",
+					"dfa84bc707cd740d3551233bfda2cfa6df519d1e7e7174882efa7dc3cdab2286",
+				},
+			},
+			"d7b975d9510021f16925d48e12ad209ad64c178e8c6f930a4ff67bffd1ac177e",
+		},
+	}
+	for name, tt := range tests {
+		t.Run(name, func(t *testing.T) {
+			if got := reconstructRootHash(tt.args.hashFile, tt.args.merkleProofs); got != tt.want {
+				t.Errorf("ReconstructRootHash() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_isHashFileCorrect(t *testing.T) {
+	type args struct {
+		hashFile       string
+		merkleProofs   []string
+		wantedRootHash string
+	}
+	tests := map[string]struct {
+		args args
+		want bool
+	}{
+		"test f1, with correct proofs, return true": {
+			args{
+				hashFile: "0dffefeae189629164f222e18c83883c1fd9b5b02eb55d5ca99bd207ebcf882d", // f1
+				merkleProofs: []string{
+					"f8addeff4cc29a9a55589ae001e2230ecd7a515de5be7eeb27da1cabba87fbe6",
+					"dfa84bc707cd740d3551233bfda2cfa6df519d1e7e7174882efa7dc3cdab2286",
+				},
+				wantedRootHash: "5880895435d8c5d8c8b549b520ef550882ab0245e1b241594c44ddffe5a6a8c0",
+			},
+			true,
+		},
+		"test f1, with not correct proofs, return false": {
+			args{
+				hashFile: "0dffefeae189629164f222e18c83883c1fd9b5b02eb55d5ca99bd207ebcf882d", // f1
+				merkleProofs: []string{
+					"f8addeff4cc29a9a55589ae001e2230ecd7a515de5be7eeb27da1cabba87fbe7",
+					"dfa84bc707cd740d3551233bfda2cfa6df519d1e7e7174882efa7dc3cdab2286",
+				},
+				wantedRootHash: "5880895435d8c5d8c8b549b520ef550882ab0245e1b241594c44ddffe5a6a8c0",
+			},
+			false,
+		},
+	}
+	for name, tt := range tests {
+		t.Run(name, func(t *testing.T) {
+			if got := isHashFileCorrect(tt.args.hashFile, tt.args.merkleProofs, tt.args.wantedRootHash); got != tt.want {
+				t.Errorf("Verify() = %v, want %v", got, tt.want)
 			}
 		})
 	}

@@ -10,26 +10,51 @@ import (
 	"strings"
 )
 
-// Verify if the file is correct and is not tampered.
+// TODO: Check go docs best practices
+
+// IsFileCorrect if the file is correct and is not tampered.
 // Returns true if the file is not tampered
 // Returns false if the file is tampered
-func Verify(hashFile string, merkleProofs []string, wantedRootHash string) bool {
-	// TODO: Check if input string is hash (len)
-	reconstructedRootHash := ReconstructRootHash(hashFile, merkleProofs)
-	isCorrect := reconstructedRootHash == wantedRootHash
-	return isCorrect
+func IsFileCorrect(file *os.File, merkleProofs []string, wantedRootHash string) (bool, error) {
+	h := sha256.New()
+	if _, err := io.Copy(h, file); err != nil {
+		log.Fatal(err)
+		return false, err
+	}
+
+	hashFile := fmt.Sprintf("%x", h.Sum(nil))
+	fmt.Println("HASH FILE verify:", hashFile)
+	return isHashFileCorrect(hashFile, merkleProofs, wantedRootHash), nil
 }
 
-// Reconstruct the root hash given the hash of the file to check and the
+func isHashFileCorrect(hashFile string, merkleProofs []string, wantedRootHash string) bool {
+	// TODO: Check if input string is hash (len)
+	// TODO: Check if merkleProof is consistent with merkletree (merkleProof ~= len(merkleTree)-1)
+	reconstructedRootHash := reconstructRootHash(hashFile, merkleProofs)
+	return reconstructedRootHash == wantedRootHash
+}
+
+func ReconstructRootHash(file *os.File, merkleProofs []string) (string, error) {
+	h := sha256.New()
+	if _, err := io.Copy(h, file); err != nil {
+		log.Fatal(err)
+		return "", err
+	}
+
+	hashFile := fmt.Sprintf("%x", h.Sum(nil))
+	fmt.Println("HASH FILE reconstruct:", hashFile)
+	return reconstructRootHash(hashFile, merkleProofs), nil
+}
+
+// Reconstruct the root hash given the sha256 hash of the file to check and the
 // merkleProofs that are needed to reconstruct the merkle tree root hash:
-// 1. hash of the file you want to check integrity
+// 1. hash of the file you want to check integrity (sha256)
 // 2. merkleProofs needed to reconstruct the root hash
 // will return the root hash
-func ReconstructRootHash(hashFile string, merkleProof []string) string {
-	// TODO: Check if input string is hash (len)
+func reconstructRootHash(hashFile string, merkleProofs []string) string {
 	rootHash := ""
 	hash := hashFile
-	for k, mp := range merkleProof {
+	for k, mp := range merkleProofs {
 		mp = strings.TrimSpace(mp)
 		fmt.Printf("hash %v: %s\n", k, hash)
 		fmt.Printf("mp %v: %s\n", k, mp)
@@ -74,47 +99,23 @@ func ComputeMerkleProof(file *os.File, merkleTree [][]string) []string {
 
 func createMerkleProof(hashFile string, merkleTree [][]string) []string {
 	merkleProof := []string{}
+	merkleTreeLeaves := merkleTree[0]
 	hash := hashFile
 
-	// NOTE: works 1 (nested cycles)
-	// treeDepth := len(merkleTree)
-	// fmt.Println("d", treeDepth)
-	// for i := 0; i < len(merkleTree)-1; i++ {
-	// 	for k, h := range merkleTree[i] {
-	// 		fmt.Println("k", k)
-	// 		if hash == h {
-	//
-	// 			if k%2 == 0 {
-	// 				merkleProof = append(merkleProof, merkleTree[i][k+1])
-	// 			} else {
-	// 				merkleProof = append(merkleProof, merkleTree[i][k-1])
-	// 			}
-	// 			if i+1 < treeDepth {
-	// 				hash = merkleTree[i+1][k/2]
-	// 			}
-	// 			break
-	// 		}
-	// 	}
-	// }
-
-	// NOTE: without nested cycles
 	found := false
-	for k, h := range merkleTree[0] {
-		if hash == h {
+	for i := 0; i < len(merkleTreeLeaves) && !found; i++ {
+		if hash == merkleTree[0][i] {
 			found = true
-			for i := 0; i < len(merkleTree)-1; i++ {
-				fmt.Println("k", k)
-				if k%2 == 0 {
-					merkleProof = append(merkleProof, merkleTree[i][k+1])
+			for j := 0; j < len(merkleTree)-1; j++ {
+				if i%2 == 0 {
+					merkleProof = append(merkleProof, merkleTree[j][i+1])
 				} else {
-					merkleProof = append(merkleProof, merkleTree[i][k-1])
+					merkleProof = append(merkleProof, merkleTree[j][i-1])
 				}
-				k = k / 2
+				i = i / 2
 			}
 		}
-		if found {
-			break
-		}
+
 	}
 
 	return merkleProof
@@ -126,6 +127,7 @@ func ComputeRootHash(files ...*os.File) (string, error) {
 		h := sha256.New()
 		if _, err := io.Copy(h, f); err != nil {
 			log.Fatal(err)
+			return "", err
 		}
 
 		hashFile := fmt.Sprintf("%x", h.Sum(nil))
@@ -144,6 +146,7 @@ func ComputeMerkleTreeAsMatrix(files ...*os.File) ([][]string, error) {
 		h := sha256.New()
 		if _, err := io.Copy(h, f); err != nil {
 			log.Fatal(err)
+			return [][]string{}, err
 		}
 
 		hashFile := fmt.Sprintf("%x", h.Sum(nil))
@@ -164,13 +167,8 @@ func createMerkleTreeAsMatrix(hashLeaves []string) [][]string {
 	log2n := math.Log2(float64(len(hashLeaves)))
 	treeDepth := math.Ceil(log2n) + 1
 
-	for i := 0; i < int(treeDepth); i++ {
+	for i := 0; i < int(treeDepth) && len(merkleTree[i]) > 1; i++ {
 		fmt.Println(len(merkleTree[i]))
-
-		if len(merkleTree[i]) == 1 {
-			fmt.Println("root hash:", merkleTree[i][0])
-			return merkleTree
-		}
 
 		if len(merkleTree[i])%2 != 0 {
 			merkleTree[i] = append(merkleTree[i], merkleTree[i][len(merkleTree[i])-1])
@@ -181,22 +179,14 @@ func createMerkleTreeAsMatrix(hashLeaves []string) [][]string {
 			fmt.Printf("hash i: %v, j: %v = %s\n", i, j+1, merkleTree[i][j+1])
 
 			pair := calculateHashPair(merkleTree[i][j], merkleTree[i][j+1])
-			if merkleTree[i][j] > merkleTree[i][j+1] {
-				pair = fmt.Sprintf("%s%s", merkleTree[i][j], merkleTree[i][j+1])
-				// pair = merkleTree[i][j] + merkleTree[i][j+1]
-			} else {
-				pair = fmt.Sprintf("%s%s", merkleTree[i][j+1], merkleTree[i][j])
-				// pair = merkleTree[i][j+1] + merkleTree[i][j]
-			}
 			fmt.Printf("pair %v: %s\n", j/2, pair)
 			h := sha256.New()
 			h.Write([]byte(pair))
 			nextHash := fmt.Sprintf("%x", h.Sum(nil))
 			upperLevelMerkleTree = append(upperLevelMerkleTree, nextHash)
-			// pair 0: f8addeff4cc29a9a55589ae001e2230ecd7a515de5be7eeb27da1cabba87fbe60dffefeae189629164f222e18c83883c1fd9b5b02eb55d5ca99bd207ebcf882d
-
 		}
 		merkleTree = append(merkleTree, upperLevelMerkleTree)
 	}
+	fmt.Println("root hash:", merkleTree[len(merkleTree)-1][0])
 	return merkleTree
 }
