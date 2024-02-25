@@ -12,6 +12,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/pavva91/merkle-tree/client/internal/utils"
 	"github.com/pavva91/merkle-tree/libs/merkletree"
 	"github.com/spf13/cobra"
 )
@@ -20,28 +21,51 @@ import (
 const (
 	DEFAULT_STORAGE_FOLDER = "./storage"
 	DEFAULT_UPLOAD_FOLDER  = "./testfiles"
-	DEFAULT_SERVER_URL     = "http://localhost:8080/files"
+	// TODO: User Viper
+	SERVER_URL = "http://localhost:8080"
 )
 
 // uploadCmd represents the upload command
 var uploadCmd = &cobra.Command{
-	// TODO: client can choose server url
-	// TODO: client can choose directory where to pick files to upload
-	// TODO: client can choose directory where to store root hash
 	Use:   "upload",
 	Short: "Bulk Upload all files in a folder",
 	Long: `Bulk upload all files inside a folder passed as input. 
 		The function will also calculate the merkle tree of the files and store the "root-hash" of the merkle tree`,
 	Run: func(cmd *cobra.Command, args []string) {
-		// uploadFolder := "~/work/zama/client/testfiles"
-		uploadFolder := "./testfiles"
-		if len(args) >= 1 && args[0] != "" {
-			uploadFolder = args[0]
+		uploadFolder := DEFAULT_UPLOAD_FOLDER
+		userUploadFolder, _ := cmd.Flags().GetString("dir")
+		if userUploadFolder != "" {
+			var err error
+			uploadFolder, err = utils.PathValidation(userUploadFolder)
+			if err != nil {
+				fmt.Println(err)
+				return
+			}
+		}
+
+		storageFolder := DEFAULT_STORAGE_FOLDER
+		userStorageFolder, _ := cmd.Flags().GetString("store")
+		if userStorageFolder != "" {
+			var err error
+			storageFolder, err = utils.PathValidation(userStorageFolder)
+			if err != nil {
+				fmt.Println(err)
+				return
+			}
+		}
+		if storageFolder == DEFAULT_STORAGE_FOLDER {
+			if !utils.DirPathIsValid(storageFolder) {
+				err := os.MkdirAll(storageFolder, os.ModePerm)
+				if err != nil {
+					fmt.Println(err)
+					return
+				}
+			}
 		}
 
 		// TODO: Check and Remove trailing "/"
 
-		url := DEFAULT_SERVER_URL
+		url := SERVER_URL + "/files"
 		method := "POST"
 
 		payload := &bytes.Buffer{}
@@ -55,8 +79,15 @@ var uploadCmd = &cobra.Command{
 		}
 
 		var rFiles []*os.File
+
 		for _, f := range files {
-			// TODO: Check if it is a file or a directory
+			if f.IsDir() {
+				fmt.Println("use a folder with only the files you want to upload, without subfolders")
+				return
+			}
+		}
+
+		for _, f := range files {
 			filePath := uploadFolder + "/" + f.Name()
 			file, err := os.Open(filePath)
 			if err != nil {
@@ -114,20 +145,8 @@ var uploadCmd = &cobra.Command{
 
 		rootHash, err := merkletree.ComputeRootHash(rFiles...)
 
-		err = os.RemoveAll(DEFAULT_STORAGE_FOLDER)
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-
-		err = os.MkdirAll(DEFAULT_STORAGE_FOLDER, os.ModePerm)
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-
 		// TODO: RW mutex to have thread-safe access to root-hash
-		rootHashPath := fmt.Sprintf("%s/%s", DEFAULT_STORAGE_FOLDER, "root-hash")
+		rootHashPath := fmt.Sprintf("%s/%s", storageFolder, "root-hash")
 		err = os.WriteFile(rootHashPath, []byte(rootHash), 0666)
 		fmt.Println("root hash stored in:", rootHashPath)
 	},
@@ -141,6 +160,8 @@ func init() {
 	// Cobra supports Persistent Flags which will work for this command
 	// and all subcommands, e.g.:
 	// uploadCmd.PersistentFlags().String("foo", "", "A help for foo")
+	uploadCmd.PersistentFlags().String("dir", "", "directory path where to bulk upload files")
+	uploadCmd.PersistentFlags().String("store", "", "Output directory path where to store root-hash")
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:

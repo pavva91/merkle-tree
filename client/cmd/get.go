@@ -16,8 +16,11 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// TODO: Idiomatic Go for constants
+// TODO: Use Viper for config
 const DEFAULT_DOWNLOAD_FOLDER = "./downloads"
+const BASE_URL = "http://localhost:8080"
+
+// TODO: Select Storage where to find root-hash
 
 // getCmd represents the get command
 var getCmd = &cobra.Command{
@@ -27,39 +30,54 @@ var getCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		downloadFolder := DEFAULT_DOWNLOAD_FOLDER
 
+		fileName := ""
+		if len(args) == 1 && args[0] != "" {
+			fileName = args[0]
+		} else {
+			fmt.Printf("insert the file name as only argument")
+			return
+		}
+
 		userDownloadFolder, _ := cmd.Flags().GetString("dir")
 		if userDownloadFolder != "" {
-			home, _ := os.UserHomeDir()
-			fmt.Println("HOME:", home)
-
-			firstChar := userDownloadFolder[:1]
-			if firstChar != "." {
-				containsHome := strings.Contains(userDownloadFolder, home)
-				if !containsHome {
-					fmt.Println("folder with absolute path must be inside home")
+			var err error
+			downloadFolder, err = utils.PathValidation(userDownloadFolder)
+			if err != nil {
+				fmt.Println(err)
+				return
+			}
+		}
+		if downloadFolder == DEFAULT_DOWNLOAD_FOLDER {
+			if !utils.DirPathIsValid(downloadFolder) {
+				err := os.MkdirAll(downloadFolder, os.ModePerm)
+				if err != nil {
+					fmt.Println(err)
 					return
 				}
 			}
-			if firstChar == "~" {
-				userDownloadFolder = home + userDownloadFolder[1:]
-			}
-			if !utils.DirPathIsValid(userDownloadFolder) {
-				fmt.Printf("folder %s does not exist", userDownloadFolder)
+		}
+
+		storageFolder := DEFAULT_STORAGE_FOLDER
+		userStorageFolder, _ := cmd.Flags().GetString("store")
+		if userStorageFolder != "" {
+			var err error
+			storageFolder, err = utils.PathValidation(userStorageFolder)
+			if err != nil {
+				fmt.Println(err)
 				return
 			}
-			downloadFolder = userDownloadFolder
+		}
+		if storageFolder == DEFAULT_STORAGE_FOLDER {
+			if !utils.DirPathIsValid(storageFolder) {
+				err := os.MkdirAll(storageFolder, os.ModePerm)
+				if err != nil {
+					fmt.Println(err)
+					return
+				}
+			}
 		}
 
-		fmt.Println("get called")
-		var fileName = "dr-who.png"
-
-		if len(args) >= 1 && args[0] != "" {
-			fileName = args[0]
-		} else {
-			// TODO: Return error and stop execution
-		}
-
-		URL := "http://localhost:8080/files/" + fileName
+		URL := BASE_URL + "/files/" + fileName
 
 		fmt.Println("Try to get '" + fileName + "' file...")
 
@@ -71,17 +89,6 @@ var getCmd = &cobra.Command{
 		defer response.Body.Close()
 
 		if response.StatusCode == 200 {
-			err := os.RemoveAll(downloadFolder)
-			if err != nil {
-				fmt.Println(err)
-				return
-			}
-
-			err = os.MkdirAll(downloadFolder, os.ModePerm)
-			if err != nil {
-				fmt.Println(err)
-				return
-			}
 
 			// Create the file
 			out, err := os.Create(fmt.Sprintf("%s/%s", downloadFolder, fileName))
@@ -183,6 +190,7 @@ func init() {
 	// Cobra supports Persistent Flags which will work for this command
 	// and all subcommands, e.g.:
 	getCmd.PersistentFlags().String("dir", "", "Output directory path where to store downloaded file")
+	getCmd.PersistentFlags().String("store", "", "Directory path where to find stored root-hash")
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
