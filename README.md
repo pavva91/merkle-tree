@@ -39,6 +39,8 @@ To run the demo these 2 steps are needed to spin-up the server and the client:
 
 #### 1. Run Server & Client
 
+First, rename `./example.env` into `./.env` and personalize with your own values, then run:
+
 ```bash
 docker compose up -d
 ```
