@@ -19,11 +19,13 @@ We expect you to send us within 7 days:
 
 For the solution I created this monorepo with the 3 codebases:
 
-- ./libs/merkletree/ : is the shared library that implements the Merkle Tree logic.
-- ./server/ : Is the server that stores the files and linked Merkle Tree.
-- ./client/ : Is the client that bulk uploads files, computes and stores their "root-hash" and then downloads one of them and checks its integrity with the locally stored "root-hash".
+- [merkletree library](./libs/merkletree/) : is the shared library that implements the Merkle Tree logic.
+- [server](./server/) : Is the server that stores the files and linked Merkle Tree.
+- [client](./client/) : Is the client that bulk uploads files into the server, computes and stores their "root-hash" and then downloads one of them and checks its integrity with the locally stored "root-hash".
 
 ### Run
+
+To run the demo these 2 steps are needed to spin-up the server and the client:
 
 #### Run Server
 
