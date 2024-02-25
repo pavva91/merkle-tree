@@ -1,11 +1,17 @@
 services:
   goserver:
     build: .
-    container_name: zama-server-stage
+    env_file: .env
+    container_name: merkle-tree-file-server
     environment:
       - USE_ENVVAR=true             
       - SERVER_HOST=0.0.0.0
-      - SERVER_PORT=8080
+      - SERVER_PORT=${PORT}
+      - MAX_BULK_UPLOAD_SIZE=33554432
+      - MAX_UPLOAD_FILE_SIZE=2097152
+      - UPLOAD_FOLDER=./uploads
+
     ports:
-      - "8080:8080"
+      - "${PORT}:${PORT}"
+      # - "8080:8080"
 version: "3.8"
