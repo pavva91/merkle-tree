@@ -1,4 +1,4 @@
-# Coding Challenge
+# Coding Challenge - Merkle Tree
 
 [![Go](https://github.com/pavva91/merkle-tree/actions/workflows/go.yml/badge.svg)](https://github.com/pavva91/merkle-tree/actions/workflows/go.yml)
 
@@ -62,8 +62,16 @@ The client uploads a large set of potentially small files {F0, F1, …, Fn} to a
 
 **_NOTE:_** By default the client bulk uploads the files from `./client/testfiles`
 
+To run with defaults:
+
 ```bash
 ./bin/client-cli upload
+```
+
+To personalize paths of upload and store root hash folders:
+
+```bash
+./bin/client-cli upload --dir ~/path/to/folder/to/bulk/upload --store ~/path/to/dir/store/root/hash
 ```
 
 ##### b) Get a file from the server and checks its integrity
@@ -74,4 +82,10 @@ The client downloads an arbitrary file from the server and checks that the file 
 
 ```bash
 ./bin/client-cli get f1
+```
+
+To personalize paths of download and retrieve stored root hash folders:
+
+```bash
+./bin/client-cli get --dir ~/path/to/folder/to/download/file --store ~/path/to/dir/store/root/hash f1
 ```
