@@ -27,13 +27,13 @@ For the solution I created this monorepo with the 3 codebases:
 
 To run the demo these 2 steps are needed to spin-up the server and the client:
 
-#### Run Server
+#### 1. Run Server
 
 ```bash
 docker compose up
 ```
 
-#### Run Client
+#### 2. Run Client
 
 ##### Build
 
@@ -42,13 +42,23 @@ cd client
 task build
 ```
 
-##### 1) Bulk upload files from a folder (by default from ./client/testfiles/)
+Then the two actions that the client does:
+
+##### a) Bulk upload files from a folder
+
+The client uploads a large set of potentially small files {F0, F1, …, Fn} to a server.
+
+**_NOTE_** By default the client bulk uploads the files from `./client/testfiles`
 
 ```bash
 ./bin/client-cli upload
 ```
 
-##### 2) Get a file from the server and checks its integrity
+##### b) Get a file from the server and checks its integrity
+
+The client downloads an arbitrary file from the server and checks that the file is correct and is not corrupted in any way (in transport, tampered with by the server, etc.).
+
+**_NOTE_** By default the client download the file into `./client/downloads`
 
 ```bash
 ./bin/client-cli get f1
