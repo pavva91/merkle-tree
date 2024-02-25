@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -13,6 +14,8 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/pavva91/merkle-tree/libs/merkletree"
 	"github.com/pavva91/merkle-tree/server/config"
+	"github.com/pavva91/merkle-tree/server/internal/dto"
+	"github.com/pavva91/merkle-tree/server/internal/errorhandlers"
 )
 
 type filesHandler struct{}
@@ -206,4 +209,69 @@ func (h filesHandler) DownloadByName(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+}
+
+// List godoc
+//
+//	@Summary		List
+//	@Description	List files
+//	@Tags			Files
+//	@Accept			json
+//	@Produce		json
+//	@Failure		400		{object}	string
+//	@Failure		404		{object}	string
+//	@Failure		500		{object}	string
+//	@Router			/files [get]
+func (h filesHandler) ListNames(w http.ResponseWriter, r *http.Request) {
+	if len(MerkleTreeMatrix) == 0 {
+		err := errors.New("no merkle tree, upload files first")
+		log.Println(err.Error())
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	dir, err := os.Open(config.Values.Server.UploadFolder)
+	if err != nil {
+		fmt.Println("error opening directory:", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	defer dir.Close()
+
+	files, err := dir.Readdir(-1)
+	if err != nil {
+		fmt.Println("error reading directory:", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	// foundFilePath := config.Values.Server.UploadFolder
+	fileNames := []string{}
+
+	for _, f := range files {
+		ss := strings.SplitAfter(f.Name(), "_")
+		fileNames = append(fileNames, ss[len(ss)-1])
+	}
+
+	// fileBytes, err := os.ReadFile("./uploads/3_1708595975295766854_f3")
+	// fmt.Println(foundFilePath)
+
+	var res dto.ListFilesResponse
+	res.ToDTO(fileNames)
+
+	js, err := json.Marshal(res)
+	if err != nil {
+		log.Println(err.Error())
+		errorhandlers.InternalServerErrorHandler(w, r)
+		return
+	}
+
+	_, err = w.Write(js)
+	if err != nil {
+		log.Println(err)
+		errorhandlers.InternalServerErrorHandler(w, r)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
 }

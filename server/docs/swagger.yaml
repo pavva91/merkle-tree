@@ -7,6 +7,28 @@ info:
   version: "1.0"
 paths:
   /files:
+    get:
+      consumes:
+      - application/json
+      description: List files
+      produces:
+      - application/json
+      responses:
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: List
+      tags:
+      - Files
     post:
       consumes:
       - multipart/form-data
