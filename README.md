@@ -1,5 +1,9 @@
 # Coding Challenge
 
+[![Go](https://github.com/pavva91/merkle-tree/actions/workflows/go.yml/badge.svg)](https://github.com/pavva91/merkle-tree/actions/workflows/go.yml)
+
+## Description
+
 Imagine a client has a large set of potentially small files {F0, F1, …, Fn} and wants to upload them to a server and then delete its local copies.
 The client wants, however, to later download an arbitrary file from the server and be convinced that the file is correct and is not corrupted in any way (in transport, tampered with by the server, etc.).
 
@@ -50,7 +54,7 @@ Then the two actions that the client does:
 
 The client uploads a large set of potentially small files {F0, F1, …, Fn} to a server.
 
-**_NOTE_** By default the client bulk uploads the files from `./client/testfiles`
+**_NOTE:_** By default the client bulk uploads the files from `./client/testfiles`
 
 ```bash
 ./bin/client-cli upload
@@ -60,7 +64,7 @@ The client uploads a large set of potentially small files {F0, F1, …, Fn} to a
 
 The client downloads an arbitrary file from the server and checks that the file is correct and is not corrupted in any way (in transport, tampered with by the server, etc.).
 
-**_NOTE_** By default the client download the file into `./client/downloads`
+**_NOTE:_** By default the client downloads the file into `./client/downloads`
 
 ```bash
 ./bin/client-cli get f1
