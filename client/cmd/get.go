@@ -14,13 +14,8 @@ import (
 	"github.com/pavva91/merkle-tree/client/internal/utils"
 	"github.com/pavva91/merkle-tree/libs/merkletree"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
-
-// TODO: Use Viper for config
-const DEFAULT_DOWNLOAD_FOLDER = "./downloads"
-const BASE_URL = "http://localhost:8080"
-
-// TODO: Select Storage where to find root-hash
 
 // getCmd represents the get command
 var getCmd = &cobra.Command{
@@ -28,7 +23,7 @@ var getCmd = &cobra.Command{
 	Short: "Get a file and check its validity",
 	Long:  `Get a file and check its validity with previously created and stored merkle tree.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		downloadFolder := DEFAULT_DOWNLOAD_FOLDER
+		downloadFolder := viper.GetString("DEFAULT_DOWNLOAD_FOLDER")
 
 		fileName := ""
 		if len(args) == 1 && args[0] != "" {
@@ -40,6 +35,15 @@ var getCmd = &cobra.Command{
 
 		userDownloadFolder, _ := cmd.Flags().GetString("dir")
 		if userDownloadFolder != "" {
+			if userDownloadFolder == viper.GetString("DEFAULT_DOWNLOAD_FOLDER") {
+				if !utils.DirPathIsValid(downloadFolder) {
+					err := os.MkdirAll(downloadFolder, os.ModePerm)
+					if err != nil {
+						fmt.Println(err)
+						return
+					}
+				}
+			}
 			var err error
 			downloadFolder, err = utils.PathValidation(userDownloadFolder)
 			if err != nil {
@@ -47,7 +51,7 @@ var getCmd = &cobra.Command{
 				return
 			}
 		}
-		if downloadFolder == DEFAULT_DOWNLOAD_FOLDER {
+		if downloadFolder == viper.GetString("DEFAULT_DOWNLOAD_FOLDER") {
 			if !utils.DirPathIsValid(downloadFolder) {
 				err := os.MkdirAll(downloadFolder, os.ModePerm)
 				if err != nil {
@@ -57,8 +61,9 @@ var getCmd = &cobra.Command{
 			}
 		}
 
-		storageFolder := DEFAULT_STORAGE_FOLDER
+		storageFolder := viper.GetString("DEFAULT_STORAGE_FOLDER")
 		userStorageFolder, _ := cmd.Flags().GetString("store")
+		fmt.Println("STORE:", userStorageFolder)
 		if userStorageFolder != "" {
 			var err error
 			storageFolder, err = utils.PathValidation(userStorageFolder)
@@ -67,7 +72,7 @@ var getCmd = &cobra.Command{
 				return
 			}
 		}
-		if storageFolder == DEFAULT_STORAGE_FOLDER {
+		if storageFolder == viper.GetString("DEFAULT_STORAGE_FOLDER") {
 			if !utils.DirPathIsValid(storageFolder) {
 				err := os.MkdirAll(storageFolder, os.ModePerm)
 				if err != nil {
@@ -77,7 +82,7 @@ var getCmd = &cobra.Command{
 			}
 		}
 
-		URL := BASE_URL + "/files/" + fileName
+		URL := viper.GetString("SERVER_URL") + "/files/" + fileName
 
 		fmt.Println("Try to get '" + fileName + "' file...")
 
@@ -113,8 +118,6 @@ var getCmd = &cobra.Command{
 				log.Printf("proof %v: %s", k, v)
 			}
 
-			// TODO: Use RWMutex for root hash
-			// TODO: Verify merkle-proof with file1 hash and root hash
 			file1, err := os.Open(downloadFolder + "/" + fileName)
 			if err != nil {
 				log.Fatal(err)
@@ -127,7 +130,7 @@ var getCmd = &cobra.Command{
 			}
 			defer file2.Close()
 
-			rootHashFile, err := os.Open(DEFAULT_STORAGE_FOLDER + "/root-hash")
+			rootHashFile, err := os.Open(storageFolder + "/root-hash")
 			if err != nil {
 				fmt.Println(err)
 				return
@@ -144,7 +147,7 @@ var getCmd = &cobra.Command{
 			rootHash := fmt.Sprint(string(rootHashBytes))
 			fmt.Println("root hash retrieved:", rootHash)
 
-			//NOTE: Verify file with merkle tree (library)
+			// Verify file with merkle tree (library)
 			reconstructedRootHash, err := merkletree.ReconstructRootHash(file1, merkleProofs)
 			if err != nil {
 				fmt.Println(err)
@@ -183,14 +186,20 @@ var getCmd = &cobra.Command{
 }
 
 func init() {
+
+	viper.SetDefault("DEFAULT_STORAGE_FOLDER", "./storage")
+	viper.SetDefault("DEFAULT_UPLOAD_FOLDER", "./testfiles")
+	viper.SetDefault("DEFAULT_DOWNLOAD_FOLDER", "./downloads")
+	viper.SetDefault("SERVER_URL", "http://localhost:8080")
+
 	rootCmd.AddCommand(getCmd)
 
 	// Here you will define your flags and configuration settings.
 
 	// Cobra supports Persistent Flags which will work for this command
 	// and all subcommands, e.g.:
-	getCmd.PersistentFlags().String("dir", "", "Output directory path where to store downloaded file")
-	getCmd.PersistentFlags().String("store", "", "Directory path where to find stored root-hash")
+	getCmd.PersistentFlags().StringP("dir", "d", viper.GetString("DEFAULT_DOWNLOAD_FOLDER"), "output directory path where to store downloaded file")
+	getCmd.PersistentFlags().StringP("store", "s", viper.GetString("DEFAULT_STORAGE_FOLDER"), "directory path where to find stored root-hash")
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
