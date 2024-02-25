@@ -33,6 +33,8 @@ To run the demo these 2 steps are needed to spin-up the server and the client:
 docker compose up
 ```
 
+Check the Swagger API in [http://localhost:8080/swagger/index.html](http://localhost:8080/swagger/index.html)
+
 #### 2. Run Client
 
 ##### Build
