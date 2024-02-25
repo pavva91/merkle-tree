@@ -16,10 +16,18 @@ import (
 	"github.com/spf13/cobra"
 )
 
-const STORAGE_FOLDER = "./storage"
+// TODO: Idiomatic Go for constants
+const (
+	DEFAULT_STORAGE_FOLDER = "./storage"
+	DEFAULT_UPLOAD_FOLDER  = "./testfiles"
+	DEFAULT_SERVER_URL     = "http://localhost:8080/files"
+)
 
 // uploadCmd represents the upload command
 var uploadCmd = &cobra.Command{
+	// TODO: client can choose server url
+	// TODO: client can choose directory where to pick files to upload
+	// TODO: client can choose directory where to store root hash
 	Use:   "upload",
 	Short: "Bulk Upload all files in a folder",
 	Long: `Bulk upload all files inside a folder passed as input. 
@@ -33,7 +41,7 @@ var uploadCmd = &cobra.Command{
 
 		// TODO: Check and Remove trailing "/"
 
-		url := "http://localhost:8080/files"
+		url := DEFAULT_SERVER_URL
 		method := "POST"
 
 		payload := &bytes.Buffer{}
@@ -48,6 +56,7 @@ var uploadCmd = &cobra.Command{
 
 		var rFiles []*os.File
 		for _, f := range files {
+			// TODO: Check if it is a file or a directory
 			filePath := uploadFolder + "/" + f.Name()
 			file, err := os.Open(filePath)
 			if err != nil {
@@ -103,26 +112,24 @@ var uploadCmd = &cobra.Command{
 
 		fmt.Println("server response:", string(body))
 
-		// TODO: compute a single Merkle tree root hash and keep it on the disk
 		rootHash, err := merkletree.ComputeRootHash(rFiles...)
 
-		err = os.RemoveAll(STORAGE_FOLDER)
+		err = os.RemoveAll(DEFAULT_STORAGE_FOLDER)
 		if err != nil {
 			fmt.Println(err)
 			return
 		}
 
-		err = os.MkdirAll(STORAGE_FOLDER, os.ModePerm)
+		err = os.MkdirAll(DEFAULT_STORAGE_FOLDER, os.ModePerm)
 		if err != nil {
 			fmt.Println(err)
 			return
 		}
 
-		// rootHash = "this is a root hash"
-
-		// TODO: mutex to have thread-safe access to resource
-		// Create the file
-		err = os.WriteFile(fmt.Sprintf("%s/%s", STORAGE_FOLDER, "root-hash"), []byte(rootHash), 0666)
+		// TODO: RW mutex to have thread-safe access to root-hash
+		rootHashPath := fmt.Sprintf("%s/%s", DEFAULT_STORAGE_FOLDER, "root-hash")
+		err = os.WriteFile(rootHashPath, []byte(rootHash), 0666)
+		fmt.Println("root hash stored in:", rootHashPath)
 	},
 }
 
