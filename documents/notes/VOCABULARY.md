@@ -1,8 +1,29 @@
 # Vocabulary
 
+Source: https://www.geeksforgeeks.org/blockchain-merkle-trees/
 A Merkle tree is a non-linear, binary, hash tree-like data structure.
 Each leaf node of the tree stores the hash value of a data element.
-Calculate Merkle Tree 4 files:
+
+## 3 Types of nodes
+1. Root Node
+2. Leaf Node
+3. Non-Leaf Node
+## Bottom Up construction
+
+- A Merkle tree is constructed from the leaf nodes level all the way up to the Merkle root level by grouping nodes in pairs and calculating the hash of each pair of nodes in that particular level. This hash value is propagated to the next level. This is a bottom-to-up type of construction where the hash values are flowing from down to up direction.
+- Hence, by comparing the Merkle tree structure to a regular binary tree data structure, one can observe that Merkle trees are actually inverted down.
+
+## COMPLEXITY
+Searching:
+- Time Complexity: O(logn)
+- Space Complexity: O(n)
+
+## DEPTH (m)
+n := number of nodes (leaves)
+m = ceil(log2(n)) + 1
+
+  Calculate Merkle Tree 4 files:
+
 
 - root = hash(hash(hash(a) + hash(b)), hash(hash(c) + hash(d)))
   leaf node = file

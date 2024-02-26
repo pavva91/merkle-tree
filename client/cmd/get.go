@@ -111,7 +111,6 @@ var getCmd = &cobra.Command{
 
 			// Get Merkle Proof
 			mp := response.Header.Get("Merkle-Proof")
-			// NOTE: To reconstruct string[] from mp:
 			merkleProofs := strings.SplitAfter(strings.Replace(strings.Replace(strings.Replace(mp, "[", "", -1), "]", "", -1), "\"", "", -1), " ")
 			for k, v := range merkleProofs {
 				log.Printf("proof %v: %s", k, v)

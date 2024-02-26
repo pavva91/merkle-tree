@@ -65,8 +65,6 @@ var uploadCmd = &cobra.Command{
 			}
 		}
 
-		// TODO: Check and Remove trailing "/"
-
 		url := viper.GetString("SERVER_URL") + "/files"
 		method := "POST"
 

@@ -42,7 +42,7 @@ func (s merkleT) Create() (*models.MerkleTree, error) {
 	}
 
 	merkleTree := &models.MerkleTree{}
-	merkleTree.Matrix, err = merkletree.ComputeMerkleTreeAsMatrix(fFiles...)
+	merkleTree.Matrix, err = merkletree.ComputeMerkleTree(fFiles...)
 	if err != nil {
 		return nil, err
 	}

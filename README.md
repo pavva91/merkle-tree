@@ -98,3 +98,35 @@ mt-client get --dir ~/path/to/folder/to/download/file --store ~/path/to/dir/stor
 ```bash
 mt-client get -d ~/path/to/folder/to/download/file -s ~/path/to/dir/store/root/hash f1
 ```
+
+### Unit Tests
+
+Run all tests:
+
+```bash
+./test.sh
+```
+
+#### Code Coverage
+
+##### Library
+
+```bash
+cd ./libs/merkletree
+go test -v ./... -coverprofile cover.out && go tool cover -html=cover.out
+```
+
+##### Server
+
+```bash
+cd ./server
+go test -v ./internal/handlers -coverprofile cover.out && go tool cover -html=cover.out
+```
+
+### Create Random Files
+
+Create a random file of 1M
+
+```bash
+dd if=/dev/urandom of=./path/to/folder/new/file/name bs=1M count=1
+```

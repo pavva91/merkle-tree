@@ -9,8 +9,8 @@ services:
       - USE_ENVVAR=true
       - SERVER_HOST=0.0.0.0
       - SERVER_PORT=${PORT}
-      - MAX_BULK_UPLOAD_SIZE=33554432
-      - MAX_UPLOAD_FILE_SIZE=2097152
+      - MAX_BULK_UPLOAD_SIZE=33554432 # 32MB
+      - MAX_UPLOAD_FILE_SIZE=2097152 # 2MB
       - UPLOAD_FOLDER=./uploads
 
     ports:

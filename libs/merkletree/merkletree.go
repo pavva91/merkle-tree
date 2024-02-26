@@ -10,8 +10,6 @@ import (
 	"strings"
 )
 
-// TODO: Check go docs best practices
-
 // IsFileCorrect if the file is correct and is not tampered.
 // Returns true if the file is not tampered
 // Returns false if the file is tampered
@@ -131,12 +129,12 @@ func ComputeRootHash(files ...*os.File) (string, error) {
 		hashLeaves = append(hashLeaves, hashFile)
 	}
 
-	merkleTree := createMerkleTreeAsMatrix(hashLeaves)
+	merkleTree := createMerkleTree(hashLeaves)
 
 	return merkleTree[len(merkleTree)-1][0], nil
 }
 
-func ComputeMerkleTreeAsMatrix(files ...*os.File) ([][]string, error) {
+func ComputeMerkleTree(files ...*os.File) ([][]string, error) {
 	var hashLeaves []string
 	for k, f := range files {
 		h := sha256.New()
@@ -150,12 +148,12 @@ func ComputeMerkleTreeAsMatrix(files ...*os.File) ([][]string, error) {
 		hashLeaves = append(hashLeaves, hashFile)
 	}
 
-	merkleTree := createMerkleTreeAsMatrix(hashLeaves)
+	merkleTree := createMerkleTree(hashLeaves)
 
 	return merkleTree, nil
 }
 
-func createMerkleTreeAsMatrix(hashLeaves []string) [][]string {
+func createMerkleTree(hashLeaves []string) [][]string {
 	merkleTree := [][]string{
 		hashLeaves,
 	}

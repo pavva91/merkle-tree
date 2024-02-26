@@ -11,7 +11,7 @@ const (
 	test3FilesPath = "./testfiles/3files"
 )
 
-func Test_createMerkleTreeAsMatrix(t *testing.T) {
+func Test_createMerkleTree(t *testing.T) {
 	type args struct {
 		hashLeaves []string
 	}
@@ -79,7 +79,7 @@ func Test_createMerkleTreeAsMatrix(t *testing.T) {
 	}
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {
-			if got := createMerkleTreeAsMatrix(tt.args.hashLeaves); !reflect.DeepEqual(got, tt.want) {
+			if got := createMerkleTree(tt.args.hashLeaves); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("CreateMerkleTree() = %v, want %v", got, tt.want)
 			}
 		})
@@ -240,7 +240,6 @@ func Test_calculateHashPair(t *testing.T) {
 		args args
 		want string
 	}{
-		// TODO: Add test cases.
 		"test reverse (ascii code) order": {
 			args{
 				h1: "aaaa",
@@ -288,7 +287,6 @@ func Test_reconstructRootHash(t *testing.T) {
 		args args
 		want string
 	}{
-		// TODO: Add test cases.
 		"test hash f1, with correct proofs, reconstruct correct rootHash": {
 			args{
 				hashFile: "0dffefeae189629164f222e18c83883c1fd9b5b02eb55d5ca99bd207ebcf882d", // f1
@@ -361,7 +359,7 @@ func Test_isHashFileCorrect(t *testing.T) {
 	}
 }
 
-func TestComputeMerkleTreeAsMatrix(t *testing.T) {
+func TestComputeMerkleTree(t *testing.T) {
 	files, err := os.ReadDir(test3FilesPath)
 	if err != nil {
 		fmt.Println(err)
@@ -388,7 +386,6 @@ func TestComputeMerkleTreeAsMatrix(t *testing.T) {
 		want    [][]string
 		wantErr bool
 	}{
-		// TODO: Add test cases.
 		"3 string hashes": {
 			args{
 				files: fFiles,
@@ -403,13 +400,13 @@ func TestComputeMerkleTreeAsMatrix(t *testing.T) {
 	}
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {
-			got, err := ComputeMerkleTreeAsMatrix(tt.args.files...)
+			got, err := ComputeMerkleTree(tt.args.files...)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("ComputeMerkleTreeAsMatrix() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("ComputeMerkleTree() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("ComputeMerkleTreeAsMatrix() = %v, want %v", got, tt.want)
+				t.Errorf("ComputeMerkleTree() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -441,7 +438,6 @@ func TestComputeRootHash(t *testing.T) {
 		want    string
 		wantErr bool
 	}{
-		// TODO: Add test cases.
 		"3 string hashes": {
 			args{
 				files: fFiles,
@@ -454,11 +450,11 @@ func TestComputeRootHash(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			got, err := ComputeRootHash(tt.args.files...)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("ComputeMerkleTreeAsMatrix() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("ComputeMerkleTree() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("ComputeMerkleTreeAsMatrix() = %v, want %v", got, tt.want)
+				t.Errorf("ComputeMerkleTree() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -491,7 +487,6 @@ func TestComputeMerkleProof(t *testing.T) {
 		args args
 		want []string
 	}{
-		// TODO: Add test cases.
 		"find first file (f1)": {
 			args{
 				file: fFiles[0],
@@ -584,7 +579,6 @@ func TestReconstructRootHash(t *testing.T) {
 		want    string
 		wantErr bool
 	}{
-		// TODO: Add test cases.
 		"test f1, with correct proofs, reconstruct correct rootHash": {
 			args{
 				file: fFiles[0],
@@ -662,7 +656,6 @@ func TestIsFileCorrect(t *testing.T) {
 		want    bool
 		wantErr bool
 	}{
-		// TODO: Add test cases.
 		"test f1, with correct proofs, return true": {
 			args{
 				file: fFiles[0],
