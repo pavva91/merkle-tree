@@ -63,7 +63,6 @@ var getCmd = &cobra.Command{
 
 		storageFolder := viper.GetString("DEFAULT_STORAGE_FOLDER")
 		userStorageFolder, _ := cmd.Flags().GetString("store")
-		fmt.Println("STORE:", userStorageFolder)
 		if userStorageFolder != "" {
 			var err error
 			storageFolder, err = utils.PathValidation(userStorageFolder)
@@ -118,6 +117,8 @@ var getCmd = &cobra.Command{
 				log.Printf("proof %v: %s", k, v)
 			}
 
+			fmt.Println("---------------------------------------------------------------------------------------")
+
 			file1, err := os.Open(downloadFolder + "/" + fileName)
 			if err != nil {
 				log.Fatal(err)
@@ -162,9 +163,6 @@ var getCmd = &cobra.Command{
 				fmt.Println(err)
 				return
 			}
-
-			iscorrect := rootHash == reconstructedRootHash
-			fmt.Println("IS CORRECT:", iscorrect)
 
 			if isFileCorrect {
 				fmt.Printf("file %s is not corrupted\n", fileName)

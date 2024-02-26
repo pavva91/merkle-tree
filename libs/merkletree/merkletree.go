@@ -164,8 +164,6 @@ func createMerkleTreeAsMatrix(hashLeaves []string) [][]string {
 	treeDepth := math.Ceil(log2n) + 1
 
 	for i := 0; i < int(treeDepth) && len(merkleTree[i]) > 1; i++ {
-		fmt.Println(len(merkleTree[i]))
-
 		if len(merkleTree[i])%2 != 0 {
 			merkleTree[i] = append(merkleTree[i], merkleTree[i][len(merkleTree[i])-1])
 		}

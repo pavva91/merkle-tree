@@ -148,6 +148,7 @@ var uploadCmd = &cobra.Command{
 		}
 
 		fmt.Println("server response:", string(body))
+		fmt.Println("---------------------------------------------------------------------------------------")
 
 		rootHash, err := merkletree.ComputeRootHash(rFiles...)
 		if err != nil {
