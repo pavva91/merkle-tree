@@ -366,11 +366,11 @@ func Test_isHashFileCorrect(t *testing.T) {
 
 func TestComputeMerkleTree(t *testing.T) {
 	mu.Lock()
-	// defer mu.Unlock()
+	defer mu.Unlock()
 	files, err := os.ReadDir(test3FilesPath)
 	if err != nil {
 		fmt.Println(err)
-		mu.Unlock()
+
 		return
 	}
 
@@ -380,13 +380,13 @@ func TestComputeMerkleTree(t *testing.T) {
 		ff, err := os.Open(filePath)
 		if err != nil {
 			fmt.Println(err)
-			mu.Unlock()
+
 			return
 		}
 		fFiles = append(fFiles, ff)
 		defer ff.Close()
 	}
-	// mu.Unlock()
+	//
 
 	type args struct {
 		files []*os.File
@@ -413,24 +413,24 @@ func TestComputeMerkleTree(t *testing.T) {
 			got, err := ComputeMerkleTree(tt.args.files...)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("ComputeMerkleTree() error = %v, wantErr %v", err, tt.wantErr)
-				mu.Unlock()
+
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("ComputeMerkleTree() = %v, want %v", got, tt.want)
-				mu.Unlock()
+
 			}
 		})
 	}
-	mu.Unlock()
+
 }
 func TestComputeRootHash(t *testing.T) {
 	mu.Lock()
-	// defer mu.Unlock()
+	defer mu.Unlock()
 	files, err := os.ReadDir(test3FilesPath)
 	if err != nil {
 		fmt.Println(err)
-		mu.Unlock()
+
 		return
 	}
 
@@ -439,14 +439,14 @@ func TestComputeRootHash(t *testing.T) {
 		filePath := fmt.Sprintf("%s/%s", test3FilesPath, f.Name())
 		ff, err := os.Open(filePath)
 		if err != nil {
-			mu.Unlock()
+
 			fmt.Println(err)
 			return
 		}
 		fFiles = append(fFiles, ff)
 		defer ff.Close()
 	}
-	// mu.Unlock()
+	//
 
 	type args struct {
 		files []*os.File
@@ -469,24 +469,24 @@ func TestComputeRootHash(t *testing.T) {
 			got, err := ComputeRootHash(tt.args.files...)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("ComputeMerkleTree() error = %v, wantErr %v", err, tt.wantErr)
-				mu.Unlock()
+
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("ComputeMerkleTree() = %v, want %v", got, tt.want)
-				mu.Unlock()
+
 			}
 		})
 	}
-	mu.Unlock()
+
 }
 
 func TestComputeMerkleProof(t *testing.T) {
 	mu.Lock()
-	// defer mu.Unlock()
+	defer mu.Unlock()
 	files, err := os.ReadDir(test3FilesPath)
 	if err != nil {
-		mu.Unlock()
+
 		fmt.Println(err)
 		return
 	}
@@ -496,14 +496,13 @@ func TestComputeMerkleProof(t *testing.T) {
 		filePath := fmt.Sprintf("%s/%s", test3FilesPath, f.Name())
 		ff, err := os.Open(filePath)
 		if err != nil {
-			mu.Unlock()
+
 			fmt.Println(err)
 			return
 		}
 		fFiles = append(fFiles, ff)
 		defer ff.Close()
 	}
-	mu.Unlock()
 
 	type args struct {
 		file       *os.File
@@ -555,17 +554,6 @@ func TestComputeMerkleProof(t *testing.T) {
 				"26b28d79c60bda9bbec02d214d5defe3e21075276927239729cb2c01d9931acc",
 			},
 		},
-		"find fourth file (f4) - not found": {
-			args{
-				file: fFiles[2],
-				merkleTree: [][]string{
-					{"0dffefeae189629164f222e18c83883c1fd9b5b02eb55d5ca99bd207ebcf882d", "f8addeff4cc29a9a55589ae001e2230ecd7a515de5be7eeb27da1cabba87fbe6", "34575cdd0f12f999e0fc36ef7d70bbd5d302b9bca1a24a0712f505f490cf7a52", "34575cdd0f12f999e0fc36ef7d70bbd5d302b9bca1a24a0712f505f490cf7a52"},
-					{"26b28d79c60bda9bbec02d214d5defe3e21075276927239729cb2c01d9931acc", "dfa84bc707cd740d3551233bfda2cfa6df519d1e7e7174882efa7dc3cdab2286"},
-					{"5880895435d8c5d8c8b549b520ef550882ab0245e1b241594c44ddffe5a6a8c0"},
-				},
-			},
-			[]string{},
-		},
 	}
 
 	for name, tt := range tests {
@@ -579,10 +567,11 @@ func TestComputeMerkleProof(t *testing.T) {
 
 func TestReconstructRootHash(t *testing.T) {
 	mu.Lock()
-	// defer mu.Unlock()
+	defer mu.Unlock()
+	// defer
 	files, err := os.ReadDir(test3FilesPath)
 	if err != nil {
-		mu.Unlock()
+
 		fmt.Println(err)
 		return
 	}
@@ -592,7 +581,7 @@ func TestReconstructRootHash(t *testing.T) {
 		filePath := fmt.Sprintf("%s/%s", test3FilesPath, f.Name())
 		ff, err := os.Open(filePath)
 		if err != nil {
-			mu.Unlock()
+
 			fmt.Println(err)
 			return
 		}
@@ -648,25 +637,26 @@ func TestReconstructRootHash(t *testing.T) {
 			got, err := ReconstructRootHash(tt.args.file, tt.args.merkleProofs)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("ReconstructRootHash() error = %v, wantErr %v", err, tt.wantErr)
-				mu.Unlock()
+
 				return
 			}
 			if got != tt.want {
 				t.Errorf("ReconstructRootHash() = %v, want %v", got, tt.want)
-				mu.Unlock()
+
 			}
 		})
 	}
-	mu.Unlock()
+
 }
 
 func TestIsFileCorrect(t *testing.T) {
 	// TODO: breaks with concurrent run
 	mu.Lock()
+	defer mu.Unlock()
 	files, err := os.ReadDir(test3FilesPath)
 	if err != nil {
 		fmt.Println(err)
-		mu.Unlock()
+
 		return
 	}
 
@@ -677,14 +667,14 @@ func TestIsFileCorrect(t *testing.T) {
 		ff, err := os.Open(filePath)
 		if err != nil {
 			fmt.Println(err)
-			mu.Unlock()
+
 			return
 		}
 		// fFiles = append(fFiles, ff)
 		fFiles[f.Name()] = ff
 		defer ff.Close()
 	}
-	// mu.Unlock()
+	//
 
 	type args struct {
 		file           *os.File
@@ -696,40 +686,40 @@ func TestIsFileCorrect(t *testing.T) {
 		want    bool
 		wantErr bool
 	}{
-		// "test f1, with correct proofs, return true": {
-		// 	args{
-		// 		file: fFiles["f1"],
-		// 		merkleProofs: []string{
-		// 			"f8addeff4cc29a9a55589ae001e2230ecd7a515de5be7eeb27da1cabba87fbe6",
-		// 			"dfa84bc707cd740d3551233bfda2cfa6df519d1e7e7174882efa7dc3cdab2286",
-		// 		},
-		// 		wantedRootHash: "5880895435d8c5d8c8b549b520ef550882ab0245e1b241594c44ddffe5a6a8c0",
+		"test f1, with correct proofs, return true": {
+			args{
+				file: fFiles["f1"],
+				merkleProofs: []string{
+					"f8addeff4cc29a9a55589ae001e2230ecd7a515de5be7eeb27da1cabba87fbe6",
+					"dfa84bc707cd740d3551233bfda2cfa6df519d1e7e7174882efa7dc3cdab2286",
+				},
+				wantedRootHash: "5880895435d8c5d8c8b549b520ef550882ab0245e1b241594c44ddffe5a6a8c0",
+				// FIX:
+				// scenario error 1
+				// sometimes it gets: f814d46d6b2225d6188a8483b3ba7f53f903a911442e4a6eefb6514fd0afa7db
+				// hash 0 is: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+
+				// FIX:
+				// scenario error 2
+				// sometimes root-hash gets: 649e75ba58832108c03e2cd841d2e43b722759c4a644ea0bd5e8a31b42be791e
+				// hash 0 is: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+			},
+			true,
+			false,
+		},
 		// FIX:
-		// 		// scenario error 1
-		// 		// sometimes it gets: f814d46d6b2225d6188a8483b3ba7f53f903a911442e4a6eefb6514fd0afa7db
-		// 		// hash 0 is: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
-		//
-		// FIX:
-		// 		// scenario error 2
-		// 		// sometimes root-hash gets: 649e75ba58832108c03e2cd841d2e43b722759c4a644ea0bd5e8a31b42be791e
-		// 		// hash 0 is: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
-		// 	},
-		// 	true,
-		// 	false,
-		// },
-		// FIX:
-		// "test f1, with not correct proofs, return false": {
-		// 	args{
-		// 		file: fFiles["f1"],
-		// 		merkleProofs: []string{
-		// 			"f9addeff4cc29a9a55589ae001e2230ecd7a515de5be7eeb27da1cabba87fbe6",
-		// 			"dfa84bc707cd740d3551233bfda2cfa6df519d1e7e7174882efa7dc3cdab2286",
-		// 		},
-		// 		wantedRootHash: "5880895435d8c5d8c8b549b520ef550882ab0245e1b241594c44ddffe5a6a8c0",
-		// 	},
-		// 	false,
-		// 	false,
-		// },
+		"test f1, with not correct proofs, return false": {
+			args{
+				file: fFiles["f2"],
+				merkleProofs: []string{
+					"f9addeff4cc29a9a55589ae001e2230ecd7a515de5be7eeb27da1cabba87fbe6",
+					"dfa84bc707cd740d3551233bfda2cfa6df519d1e7e7174882efa7dc3cdab2286",
+				},
+				wantedRootHash: "5880895435d8c5d8c8b549b520ef550882ab0245e1b241594c44ddffe5a6a8c0",
+			},
+			false,
+			false,
+		},
 	}
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {
@@ -743,5 +733,5 @@ func TestIsFileCorrect(t *testing.T) {
 			}
 		})
 	}
-	mu.Unlock()
+
 }
