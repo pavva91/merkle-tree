@@ -6,13 +6,11 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"os"
 	"strings"
 
 	"github.com/gorilla/mux"
 	"github.com/pavva91/merkle-tree/server/config"
 	"github.com/pavva91/merkle-tree/server/internal/dto"
-	"github.com/pavva91/merkle-tree/server/internal/errorhandlers"
 	"github.com/pavva91/merkle-tree/server/internal/services"
 )
 
@@ -138,31 +136,11 @@ func (h filesHandler) ListNames(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	dir, err := os.Open(config.Values.Server.UploadFolder)
+	fileNames, err := services.File.List()
 	if err != nil {
-		fmt.Println("error opening directory:", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	defer dir.Close()
-
-	files, err := dir.Readdir(-1)
-	if err != nil {
-		fmt.Println("error reading directory:", err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	// foundFilePath := config.Values.Server.UploadFolder
-	fileNames := []string{}
-
-	for _, f := range files {
-		ss := strings.SplitAfter(f.Name(), "_")
-		fileNames = append(fileNames, ss[len(ss)-1])
-	}
-
-	// fileBytes, err := os.ReadFile("./uploads/3_1708595975295766854_f3")
-	// fmt.Println(foundFilePath)
 
 	var res dto.ListFilesResponse
 	res.ToDTO(fileNames)
@@ -170,14 +148,14 @@ func (h filesHandler) ListNames(w http.ResponseWriter, r *http.Request) {
 	js, err := json.Marshal(res)
 	if err != nil {
 		log.Println(err.Error())
-		errorhandlers.InternalServerErrorHandler(w, r)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	_, err = w.Write(js)
 	if err != nil {
 		log.Println(err)
-		errorhandlers.InternalServerErrorHandler(w, r)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 

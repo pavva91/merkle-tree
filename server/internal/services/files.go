@@ -21,6 +21,7 @@ type Filer interface {
 	ResetUploadDir() error
 	SaveBulk(files []*multipart.FileHeader) error
 	GetByName(fileName string) ([]byte, string, error)
+	List() ([]string, error)
 }
 
 type file struct{}
@@ -109,4 +110,27 @@ func (s file) GetByName(fileName string) ([]byte, string, error) {
 	}
 
 	return fileBytes, foundFilePath, nil
+}
+
+func (s file) List() ([]string, error) {
+	dir, err := os.Open(config.Values.Server.UploadFolder)
+	if err != nil {
+		log.Println("error opening directory:", err)
+		return nil, err
+	}
+	defer dir.Close()
+
+	files, err := dir.Readdir(-1)
+	if err != nil {
+		log.Println("error reading directory:", err)
+		return nil, err
+	}
+
+	fileNames := []string{}
+
+	for _, f := range files {
+		ss := strings.SplitAfter(f.Name(), "_")
+		fileNames = append(fileNames, ss[len(ss)-1])
+	}
+	return fileNames, nil
 }

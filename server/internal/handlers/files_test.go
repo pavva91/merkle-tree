@@ -34,8 +34,6 @@ func Test_filesHandler_BulkUpload(t *testing.T) {
 		return
 	}
 
-	var rFiles []*os.File
-
 	for _, f := range files {
 		if f.IsDir() {
 			fmt.Println("use a folder with only the files you want to upload, without subfolders")
@@ -51,14 +49,6 @@ func Test_filesHandler_BulkUpload(t *testing.T) {
 			return
 		}
 		defer file.Close()
-
-		file2, err := os.Open(filePath)
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-		rFiles = append(rFiles, file2)
-		defer file2.Close()
 
 		part, err := writer.CreateFormFile("file", filepath.Base(filePath))
 		if err != nil {
@@ -369,21 +359,93 @@ func Test_filesHandler_DownloadByName(t *testing.T) {
 }
 
 func Test_filesHandler_ListNames(t *testing.T) {
-	type args struct {
-		w http.ResponseWriter
-		r *http.Request
+
+	stubMTfail1 := stubs.MerkleTreeService{}
+	stubMTfail1.IsValidFn = func() bool {
+		return false
 	}
-	tests := []struct {
-		name string
-		h    filesHandler
-		args args
+
+	stubMTOK := stubs.MerkleTreeService{}
+	stubMTOK.IsValidFn = func() bool {
+		return true
+	}
+
+	stubFileFail1 := stubs.FileService{}
+	stubFileFail1.ListFn = func() ([]string, error) {
+		return []string{}, errors.New("stub error get file")
+	}
+
+	stubFileEmpty := stubs.FileService{}
+	stubFileEmpty.ListFn = func() ([]string, error) {
+		return []string{}, nil
+	}
+
+	stubFileOK := stubs.FileService{}
+	stubFileOK.ListFn = func() ([]string, error) {
+		return []string{"f1", "f2", "f3"}, nil
+	}
+
+	tests := map[string]struct {
+		stub1            stubs.MerkleTreeService
+		stub2            stubs.FileService
+		wantErr          bool
+		expectedHttpCode int
+		expectedResBody  string
 	}{
-		// TODO: Add test cases.
+		"not initalized merkle tree": {
+			stubMTfail1,
+			stubs.FileService{},
+			true,
+			400,
+			"no merkle tree, upload files first\n",
+		},
+		"list files fails, generic error": {
+			stubMTOK,
+			stubFileFail1,
+			true,
+			500,
+			"stub error get file\n",
+		},
+		"list files ok, empty list": {
+			stubMTOK,
+			stubFileEmpty,
+			false,
+			200,
+			"{\"filenames\":[]}",
+		},
+		"list files ok": {
+			stubMTOK,
+			stubFileOK,
+			false,
+			200,
+			"{\"filenames\":[\"f1\",\"f2\",\"f3\"]}",
+		},
 	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			h := filesHandler{}
-			h.ListNames(tt.args.w, tt.args.r)
+	for name, tt := range tests {
+		t.Run(name, func(t *testing.T) {
+			services.MerkleTree = tt.stub1
+			services.File = tt.stub2
+
+			r, err := http.NewRequest("GET", "/files", nil)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			w := httptest.NewRecorder()
+
+			handler := http.HandlerFunc(FilesHandler.ListNames)
+			handler.ServeHTTP(w, r)
+
+			if (w.Code != 200) != tt.wantErr {
+				t.Errorf("CreateTaskRequest.Validate() error = %v, wantErr %v", w.Code, tt.wantErr)
+			}
+			if w.Code != tt.expectedHttpCode {
+				t.Errorf("CreateTaskRequest.Validate() error = %v, wantErr %v", w.Code, tt.expectedHttpCode)
+			}
+			if w.Body.String() != tt.expectedResBody {
+				t.Errorf("handler returned unexpected body: got %v want %v",
+					w.Body.String(), tt.expectedResBody)
+			}
 		})
 	}
 }
