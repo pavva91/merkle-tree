@@ -386,7 +386,7 @@ func TestComputeMerkleTree(t *testing.T) {
 		fFiles = append(fFiles, ff)
 		defer ff.Close()
 	}
-	mu.Unlock()
+	// mu.Unlock()
 
 	type args struct {
 		files []*os.File
@@ -413,13 +413,16 @@ func TestComputeMerkleTree(t *testing.T) {
 			got, err := ComputeMerkleTree(tt.args.files...)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("ComputeMerkleTree() error = %v, wantErr %v", err, tt.wantErr)
+				mu.Unlock()
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("ComputeMerkleTree() = %v, want %v", got, tt.want)
+				mu.Unlock()
 			}
 		})
 	}
+	mu.Unlock()
 }
 func TestComputeRootHash(t *testing.T) {
 	mu.Lock()
@@ -443,7 +446,7 @@ func TestComputeRootHash(t *testing.T) {
 		fFiles = append(fFiles, ff)
 		defer ff.Close()
 	}
-	mu.Unlock()
+	// mu.Unlock()
 
 	type args struct {
 		files []*os.File
@@ -466,13 +469,16 @@ func TestComputeRootHash(t *testing.T) {
 			got, err := ComputeRootHash(tt.args.files...)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("ComputeMerkleTree() error = %v, wantErr %v", err, tt.wantErr)
+				mu.Unlock()
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("ComputeMerkleTree() = %v, want %v", got, tt.want)
+				mu.Unlock()
 			}
 		})
 	}
+	mu.Unlock()
 }
 
 func TestComputeMerkleProof(t *testing.T) {
@@ -593,7 +599,6 @@ func TestReconstructRootHash(t *testing.T) {
 		fFiles = append(fFiles, ff)
 		defer ff.Close()
 	}
-	mu.Unlock()
 
 	type args struct {
 		file         *os.File
@@ -643,13 +648,16 @@ func TestReconstructRootHash(t *testing.T) {
 			got, err := ReconstructRootHash(tt.args.file, tt.args.merkleProofs)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("ReconstructRootHash() error = %v, wantErr %v", err, tt.wantErr)
+				mu.Unlock()
 				return
 			}
 			if got != tt.want {
 				t.Errorf("ReconstructRootHash() = %v, want %v", got, tt.want)
+				mu.Unlock()
 			}
 		})
 	}
+	mu.Unlock()
 }
 
 func TestIsFileCorrect(t *testing.T) {
