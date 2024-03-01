@@ -1,4 +1,5 @@
-FROM golang:1.22
+# build stage
+FROM golang:1.22-alpine as build
 
 WORKDIR /root/app
 
@@ -9,6 +10,18 @@ WORKDIR /root/app/client
 
 RUN go mod download && go mod verify
 
-RUN go build -v -o /usr/local/bin/mt-client ./main.go
+# RUN go build -v -o /usr/local/bin/mt-client ./main.go
+RUN go build -v -o /mt-client ./main.go
 
-ENTRYPOINT ["bash"]
+# runtime stage
+FROM alpine
+
+WORKDIR /usr/local/bin
+
+COPY --from=build /mt-client .
+
+WORKDIR /root/app
+
+COPY ./client/testfiles/ ./testfiles/
+
+ENTRYPOINT ["ash"]
