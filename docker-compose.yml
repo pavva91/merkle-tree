@@ -5,16 +5,19 @@ services:
       dockerfile: ./Dockerfile.server
     env_file: .env
     container_name: merkle-tree-file-server
+    labels:
+      kompose.service.type: LoadBalancer
     environment:
       - USE_ENVVAR=true
       - SERVER_HOST=0.0.0.0
-      - SERVER_PORT=${PORT}
+      # - SERVER_PORT=${PORT}
+      - SERVER_PORT=8080
       - MAX_BULK_UPLOAD_SIZE=33554432 # 32MB
       - MAX_UPLOAD_FILE_SIZE=2097152 # 2MB
       - UPLOAD_FOLDER=./uploads
-
-    ports:
-      - "${PORT}:${PORT}"
+    # ports:
+      # - "${PORT}:${PORT}"
+      # - 8080:8080
   client:
     depends_on:
       - server
@@ -28,5 +31,7 @@ services:
       - DEFAULT_STORAGE_FOLDER=./storage
       - DEFAULT_DOWNLOAD_FOLDER=./downloads
       - DEFAULT_UPLOAD_FOLDER=./testfiles
-      - SERVER_URL=http://172.17.0.1:${PORT}
+      # - SERVER_URL=http://172.17.0.1:${PORT}
+      # - SERVER_URL=http://172.17.0.1:8080
+      - SERVER_URL=http://merkle-tree-file-server:8080
 version: "3.8"
