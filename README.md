@@ -50,7 +50,7 @@ Check the Swagger API in [http://localhost:8080/swagger/index.html](http://local
 #### 2. Open Client
 
 ```bash
-docker exec -it mt-client bash
+docker attach mt-client
 ```
 
 Then the two actions that the client does:
