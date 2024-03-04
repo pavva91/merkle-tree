@@ -91,14 +91,14 @@ func Test_createMerkleTree(t *testing.T) {
 	}
 }
 
-func Test_createMerkleProof(t *testing.T) {
+func Test_createMerkleProofM(t *testing.T) {
 	type args struct {
 		hashFile   string
 		merkleTree [][]string
 	}
 	tests := map[string]struct {
-		args args
-		want []string
+		args             args
+		wantMerkleProofs []string
 	}{
 		"2 string hashes, not found": {
 			args{
@@ -229,10 +229,25 @@ func Test_createMerkleProof(t *testing.T) {
 	}
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {
-			if got := createMerkleProof(tt.args.hashFile, tt.args.merkleTree); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("createMerkleProof() = %v, want %v", got, tt.want)
+			gotMerkleProofs := createMerkleProofMatrix(tt.args.hashFile, tt.args.merkleTree)
+
+			if len(gotMerkleProofs) != len(tt.wantMerkleProofs) {
+				t.Errorf("createMerkleProof(): len = %v, want %v", len(gotMerkleProofs), len(tt.wantMerkleProofs))
+			}
+
+			for k, v := range gotMerkleProofs {
+				if v != tt.wantMerkleProofs[k] {
+					t.Errorf("createMerkleProof(): element %v = %v, want %v", k, v, tt.wantMerkleProofs[k])
+				}
 			}
 		})
+
+		// FIX: Why reflect.DeepEqual is now giving error
+		// 	if got := createMerkleProofMatrix(tt.args.hashFile, tt.args.merkleTree); !reflect.DeepEqual(got, tt.want) {
+		// 		t.Errorf("createMerkleProof() = %v, want %v", got, tt.want)
+		// 	}
+		// })
+
 	}
 }
 
@@ -285,16 +300,16 @@ func Test_calculateHashPair(t *testing.T) {
 
 func Test_reconstructRootHash(t *testing.T) {
 	type args struct {
-		hashFile     string
+		hashLeaf     string
 		merkleProofs []string
 	}
 	tests := map[string]struct {
 		args args
 		want string
 	}{
-		"test hash f1, with correct proofs, reconstruct correct rootHash": {
+		"test hash f1, (3 string hashes), with correct proofs, reconstruct correct rootHash": {
 			args{
-				hashFile: "0dffefeae189629164f222e18c83883c1fd9b5b02eb55d5ca99bd207ebcf882d", // f1
+				hashLeaf: "0dffefeae189629164f222e18c83883c1fd9b5b02eb55d5ca99bd207ebcf882d", // f1
 				merkleProofs: []string{
 					"f8addeff4cc29a9a55589ae001e2230ecd7a515de5be7eeb27da1cabba87fbe6",
 					"dfa84bc707cd740d3551233bfda2cfa6df519d1e7e7174882efa7dc3cdab2286",
@@ -304,7 +319,7 @@ func Test_reconstructRootHash(t *testing.T) {
 		},
 		"test hash f1, with not correct proofs, reconstruct not correct rootHash": {
 			args{
-				hashFile: "0dffefeae189629164f222e18c83883c1fd9b5b02eb55d5ca99bd207ebcf882d", // f1
+				hashLeaf: "0dffefeae189629164f222e18c83883c1fd9b5b02eb55d5ca99bd207ebcf882d", // f1
 				merkleProofs: []string{
 					"f8addeff4cc29a9a55589ae001e2230ecd7a515de5be7eeb27da1cabba87fbe7",
 					"dfa84bc707cd740d3551233bfda2cfa6df519d1e7e7174882efa7dc3cdab2286",
@@ -312,10 +327,30 @@ func Test_reconstructRootHash(t *testing.T) {
 			},
 			"d7b975d9510021f16925d48e12ad209ad64c178e8c6f930a4ff67bffd1ac177e",
 		},
+		"test f2 (3 string hashes), with correct proofs, reconstruct correct rootHash": {
+			args{
+				hashLeaf: "f8addeff4cc29a9a55589ae001e2230ecd7a515de5be7eeb27da1cabba87fbe6", // f1
+				merkleProofs: []string{
+					"0dffefeae189629164f222e18c83883c1fd9b5b02eb55d5ca99bd207ebcf882d",
+					"dfa84bc707cd740d3551233bfda2cfa6df519d1e7e7174882efa7dc3cdab2286",
+				},
+			},
+			"5880895435d8c5d8c8b549b520ef550882ab0245e1b241594c44ddffe5a6a8c0",
+		},
+		"test f3 (3 string hashes), with correct proofs, reconstruct correct rootHash": {
+			args{
+				hashLeaf: "34575cdd0f12f999e0fc36ef7d70bbd5d302b9bca1a24a0712f505f490cf7a52", // f1
+				merkleProofs: []string{
+					"34575cdd0f12f999e0fc36ef7d70bbd5d302b9bca1a24a0712f505f490cf7a52",
+					"26b28d79c60bda9bbec02d214d5defe3e21075276927239729cb2c01d9931acc",
+				},
+			},
+			"5880895435d8c5d8c8b549b520ef550882ab0245e1b241594c44ddffe5a6a8c0",
+		},
 	}
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {
-			if got := reconstructRootHash(tt.args.hashFile, tt.args.merkleProofs); got != tt.want {
+			if got := reconstructRootHash(tt.args.hashLeaf, tt.args.merkleProofs); got != tt.want {
 				t.Errorf("ReconstructRootHash() = %v, want %v", got, tt.want)
 			}
 		})

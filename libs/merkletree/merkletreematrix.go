@@ -86,13 +86,14 @@ func ComputeMerkleProof(file *os.File, merkleTree [][]string) []string {
 	hashFile := fmt.Sprintf("%x", h.Sum(nil))
 
 	fmt.Printf("hash file: %s\n", hashFile)
-	merkleProof := createMerkleProof(hashFile, merkleTree)
+	merkleProof := createMerkleProofMatrix(hashFile, merkleTree)
 
 	return merkleProof
 }
 
-func createMerkleProof(hashFile string, merkleTree [][]string) []string {
-	merkleProof := []string{}
+// merkleProofs is ordered from bottom to top (from leaves towards root-hash)
+func createMerkleProofMatrix(hashFile string, merkleTree [][]string) (merkleProofs []string) {
+	// merkleProof := []string{}
 	merkleTreeLeaves := merkleTree[0]
 	hash := hashFile
 
@@ -102,9 +103,9 @@ func createMerkleProof(hashFile string, merkleTree [][]string) []string {
 			found = true
 			for j := 0; j < len(merkleTree)-1; j++ {
 				if i%2 == 0 {
-					merkleProof = append(merkleProof, merkleTree[j][i+1])
+					merkleProofs = append(merkleProofs, merkleTree[j][i+1])
 				} else {
-					merkleProof = append(merkleProof, merkleTree[j][i-1])
+					merkleProofs = append(merkleProofs, merkleTree[j][i-1])
 				}
 				i = i / 2
 			}
@@ -112,7 +113,7 @@ func createMerkleProof(hashFile string, merkleTree [][]string) []string {
 
 	}
 
-	return merkleProof
+	return merkleProofs
 }
 
 func ComputeRootHash(files ...*os.File) (string, error) {
