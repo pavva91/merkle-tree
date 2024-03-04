@@ -258,6 +258,296 @@ func Test_createMerkleProof(t *testing.T) {
 				"26b28d79c60bda9bbec02d214d5defe3e21075276927239729cb2c01d9931acc",
 			},
 		},
+		"5 string hashes, found h5": {
+			args{
+				merkleTree: MerkleTree{
+					RootHashNode: &BinaryNode{
+						Value: "12761d3647c296c8a6e39bb363652479da1e95382128ba28c6eb0e79ee74a97a",
+						LeftNode: &BinaryNode{
+							Value: "c14124471a06847b5042b48aa94ece8030e2a21fbcf2927e2741ef2602f37363",
+							LeftNode: &BinaryNode{
+								Value: "dac079ce8e97c5434424c28112b96e601aa4ff36ba0377619b9e38f473310cf3",
+								LeftNode: &BinaryNode{
+									Value: "h1",
+								},
+								RightNode: &BinaryNode{
+									Value: "h2",
+								},
+							},
+							RightNode: &BinaryNode{
+								Value: "55c82a1f310283eefe23c4e02d409428fb0e768551eb4845291ed67ac2b16ec3",
+								LeftNode: &BinaryNode{
+									Value: "h3",
+								},
+								RightNode: &BinaryNode{
+									Value: "h4",
+								},
+							},
+						},
+						RightNode: &BinaryNode{
+							Value: "3a31f2d07d9715bc3e48106ecbdcb02e2081e96d3537a47b54975a0c52be66b7",
+							LeftNode: &BinaryNode{
+								Value: "77c1e48fb22fdbd534fd76bc0b8fa98745e113634512b7171ceaae33b097e6fd",
+								LeftNode: &BinaryNode{
+									Value: "h5",
+								},
+								RightNode: &BinaryNode{
+									Value: "h5",
+								},
+							},
+							RightNode: &BinaryNode{
+								Value: "77c1e48fb22fdbd534fd76bc0b8fa98745e113634512b7171ceaae33b097e6fd",
+							},
+						},
+					},
+					HashLeaves: []string{
+						"h1",
+						"h2",
+						"h3",
+						"h4",
+						"h5",
+					},
+				},
+				hashLeaf: "h5",
+			},
+			[]string{
+				"h5",
+				"77c1e48fb22fdbd534fd76bc0b8fa98745e113634512b7171ceaae33b097e6fd",
+				"c14124471a06847b5042b48aa94ece8030e2a21fbcf2927e2741ef2602f37363",
+			},
+		},
+		"5 string hashes, found h4": {
+			args{
+				merkleTree: MerkleTree{
+					RootHashNode: &BinaryNode{
+						Value: "12761d3647c296c8a6e39bb363652479da1e95382128ba28c6eb0e79ee74a97a",
+						LeftNode: &BinaryNode{
+							Value: "c14124471a06847b5042b48aa94ece8030e2a21fbcf2927e2741ef2602f37363",
+							LeftNode: &BinaryNode{
+								Value: "dac079ce8e97c5434424c28112b96e601aa4ff36ba0377619b9e38f473310cf3",
+								LeftNode: &BinaryNode{
+									Value: "h1",
+								},
+								RightNode: &BinaryNode{
+									Value: "h2",
+								},
+							},
+							RightNode: &BinaryNode{
+								Value: "55c82a1f310283eefe23c4e02d409428fb0e768551eb4845291ed67ac2b16ec3",
+								LeftNode: &BinaryNode{
+									Value: "h3",
+								},
+								RightNode: &BinaryNode{
+									Value: "h4",
+								},
+							},
+						},
+						RightNode: &BinaryNode{
+							Value: "3a31f2d07d9715bc3e48106ecbdcb02e2081e96d3537a47b54975a0c52be66b7",
+							LeftNode: &BinaryNode{
+								Value: "77c1e48fb22fdbd534fd76bc0b8fa98745e113634512b7171ceaae33b097e6fd",
+								LeftNode: &BinaryNode{
+									Value: "h5",
+								},
+								RightNode: &BinaryNode{
+									Value: "h5",
+								},
+							},
+							RightNode: &BinaryNode{
+								Value: "77c1e48fb22fdbd534fd76bc0b8fa98745e113634512b7171ceaae33b097e6fd",
+							},
+						},
+					},
+					HashLeaves: []string{
+						"h1",
+						"h2",
+						"h3",
+						"h4",
+						"h5",
+					},
+				},
+				hashLeaf: "h4",
+			},
+			[]string{
+				"h3",
+				"dac079ce8e97c5434424c28112b96e601aa4ff36ba0377619b9e38f473310cf3",
+				"3a31f2d07d9715bc3e48106ecbdcb02e2081e96d3537a47b54975a0c52be66b7",
+			},
+		},
+		"5 string hashes, found h3": {
+			args{
+				merkleTree: MerkleTree{
+					RootHashNode: &BinaryNode{
+						Value: "12761d3647c296c8a6e39bb363652479da1e95382128ba28c6eb0e79ee74a97a",
+						LeftNode: &BinaryNode{
+							Value: "c14124471a06847b5042b48aa94ece8030e2a21fbcf2927e2741ef2602f37363",
+							LeftNode: &BinaryNode{
+								Value: "dac079ce8e97c5434424c28112b96e601aa4ff36ba0377619b9e38f473310cf3",
+								LeftNode: &BinaryNode{
+									Value: "h1",
+								},
+								RightNode: &BinaryNode{
+									Value: "h2",
+								},
+							},
+							RightNode: &BinaryNode{
+								Value: "55c82a1f310283eefe23c4e02d409428fb0e768551eb4845291ed67ac2b16ec3",
+								LeftNode: &BinaryNode{
+									Value: "h3",
+								},
+								RightNode: &BinaryNode{
+									Value: "h4",
+								},
+							},
+						},
+						RightNode: &BinaryNode{
+							Value: "3a31f2d07d9715bc3e48106ecbdcb02e2081e96d3537a47b54975a0c52be66b7",
+							LeftNode: &BinaryNode{
+								Value: "77c1e48fb22fdbd534fd76bc0b8fa98745e113634512b7171ceaae33b097e6fd",
+								LeftNode: &BinaryNode{
+									Value: "h5",
+								},
+								RightNode: &BinaryNode{
+									Value: "h5",
+								},
+							},
+							RightNode: &BinaryNode{
+								Value: "77c1e48fb22fdbd534fd76bc0b8fa98745e113634512b7171ceaae33b097e6fd",
+							},
+						},
+					},
+					HashLeaves: []string{
+						"h1",
+						"h2",
+						"h3",
+						"h4",
+						"h5",
+					},
+				},
+				hashLeaf: "h3",
+			},
+			[]string{
+				"h4",
+				"dac079ce8e97c5434424c28112b96e601aa4ff36ba0377619b9e38f473310cf3",
+				"3a31f2d07d9715bc3e48106ecbdcb02e2081e96d3537a47b54975a0c52be66b7",
+			},
+		},
+		"5 string hashes, found h2": {
+			args{
+				merkleTree: MerkleTree{
+					RootHashNode: &BinaryNode{
+						Value: "12761d3647c296c8a6e39bb363652479da1e95382128ba28c6eb0e79ee74a97a",
+						LeftNode: &BinaryNode{
+							Value: "c14124471a06847b5042b48aa94ece8030e2a21fbcf2927e2741ef2602f37363",
+							LeftNode: &BinaryNode{
+								Value: "dac079ce8e97c5434424c28112b96e601aa4ff36ba0377619b9e38f473310cf3",
+								LeftNode: &BinaryNode{
+									Value: "h1",
+								},
+								RightNode: &BinaryNode{
+									Value: "h2",
+								},
+							},
+							RightNode: &BinaryNode{
+								Value: "55c82a1f310283eefe23c4e02d409428fb0e768551eb4845291ed67ac2b16ec3",
+								LeftNode: &BinaryNode{
+									Value: "h3",
+								},
+								RightNode: &BinaryNode{
+									Value: "h4",
+								},
+							},
+						},
+						RightNode: &BinaryNode{
+							Value: "3a31f2d07d9715bc3e48106ecbdcb02e2081e96d3537a47b54975a0c52be66b7",
+							LeftNode: &BinaryNode{
+								Value: "77c1e48fb22fdbd534fd76bc0b8fa98745e113634512b7171ceaae33b097e6fd",
+								LeftNode: &BinaryNode{
+									Value: "h5",
+								},
+								RightNode: &BinaryNode{
+									Value: "h5",
+								},
+							},
+							RightNode: &BinaryNode{
+								Value: "77c1e48fb22fdbd534fd76bc0b8fa98745e113634512b7171ceaae33b097e6fd",
+							},
+						},
+					},
+					HashLeaves: []string{
+						"h1",
+						"h2",
+						"h3",
+						"h4",
+						"h5",
+					},
+				},
+				hashLeaf: "h2",
+			},
+			[]string{
+				"h1",
+				"55c82a1f310283eefe23c4e02d409428fb0e768551eb4845291ed67ac2b16ec3",
+				"3a31f2d07d9715bc3e48106ecbdcb02e2081e96d3537a47b54975a0c52be66b7",
+			},
+		},
+		"5 string hashes, found h1": {
+			args{
+				merkleTree: MerkleTree{
+					RootHashNode: &BinaryNode{
+						Value: "12761d3647c296c8a6e39bb363652479da1e95382128ba28c6eb0e79ee74a97a",
+						LeftNode: &BinaryNode{
+							Value: "c14124471a06847b5042b48aa94ece8030e2a21fbcf2927e2741ef2602f37363",
+							LeftNode: &BinaryNode{
+								Value: "dac079ce8e97c5434424c28112b96e601aa4ff36ba0377619b9e38f473310cf3",
+								LeftNode: &BinaryNode{
+									Value: "h1",
+								},
+								RightNode: &BinaryNode{
+									Value: "h2",
+								},
+							},
+							RightNode: &BinaryNode{
+								Value: "55c82a1f310283eefe23c4e02d409428fb0e768551eb4845291ed67ac2b16ec3",
+								LeftNode: &BinaryNode{
+									Value: "h3",
+								},
+								RightNode: &BinaryNode{
+									Value: "h4",
+								},
+							},
+						},
+						RightNode: &BinaryNode{
+							Value: "3a31f2d07d9715bc3e48106ecbdcb02e2081e96d3537a47b54975a0c52be66b7",
+							LeftNode: &BinaryNode{
+								Value: "77c1e48fb22fdbd534fd76bc0b8fa98745e113634512b7171ceaae33b097e6fd",
+								LeftNode: &BinaryNode{
+									Value: "h5",
+								},
+								RightNode: &BinaryNode{
+									Value: "h5",
+								},
+							},
+							RightNode: &BinaryNode{
+								Value: "77c1e48fb22fdbd534fd76bc0b8fa98745e113634512b7171ceaae33b097e6fd",
+							},
+						},
+					},
+					HashLeaves: []string{
+						"h1",
+						"h2",
+						"h3",
+						"h4",
+						"h5",
+					},
+				},
+				hashLeaf: "h1",
+			},
+			[]string{
+				"h2",
+				"55c82a1f310283eefe23c4e02d409428fb0e768551eb4845291ed67ac2b16ec3",
+				"3a31f2d07d9715bc3e48106ecbdcb02e2081e96d3537a47b54975a0c52be66b7",
+			},
+		},
 	}
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {
