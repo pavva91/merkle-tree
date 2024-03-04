@@ -3,6 +3,7 @@ package merkletree
 import (
 	"crypto/sha256"
 	"fmt"
+	"math"
 	"slices"
 )
 
@@ -19,9 +20,8 @@ type MerkleTree struct {
 	HashLeaves   []string
 }
 
-// TODO: Do tests
-// len(merkleProofs) = ceil(log2(n))
-func createMerkleProof2(hashLeaf string, merkleTree MerkleTree) (merkleProofs []string) {
+// merkleProofs is ordered from bottom to top (from leaves towards root-hash)
+func createMerkleProof(hashLeaf string, merkleTree MerkleTree) (merkleProofs []string) {
 	iProofs := []int{}
 	indexLeaf := -1
 	for k, v := range merkleTree.HashLeaves {
@@ -37,18 +37,13 @@ func createMerkleProof2(hashLeaf string, merkleTree MerkleTree) (merkleProofs []
 
 	// 0 : Left
 	// 1 : Right
-	for i := 0; indexLeaf > 1; i++ {
+	log2n := math.Log2(float64(len(merkleTree.HashLeaves)))
+	lengthMerkleProofs := math.Ceil(log2n)
+
+	for i := 0; i < int(lengthMerkleProofs); i++ {
 		iProof := 1 - (indexLeaf % 2)
 		iProofs = append(iProofs, iProof)
 		indexLeaf = indexLeaf / 2
-	}
-
-	if indexLeaf == 1 {
-		iProofs = append(iProofs, 0)
-	}
-
-	if indexLeaf == 0 {
-		iProofs = append(iProofs, 1)
 	}
 
 	slices.Reverse(iProofs)
@@ -65,6 +60,8 @@ func createMerkleProof2(hashLeaf string, merkleTree MerkleTree) (merkleProofs []
 			nextNode = nextNode.LeftNode
 		}
 	}
+
+	slices.Reverse(merkleProofs)
 
 	return merkleProofs
 }
