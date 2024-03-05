@@ -86,17 +86,22 @@ var getCmd = &cobra.Command{
 		fmt.Println("Try to get '" + fileName + "' file...")
 
 		// Get the data
-		response, err := http.Get(URL)
+		req, err := http.NewRequest(http.MethodGet, URL, nil)
 		if err != nil {
 			fmt.Println(err)
 		}
-		defer response.Body.Close()
 
-		if response.StatusCode == 200 {
+		res, err := http.DefaultClient.Do(req)
+		if err != nil {
+			fmt.Println(err)
+		}
+
+		defer res.Body.Close()
+
+		if res.StatusCode == 200 {
 
 			// Create the file
 			out, err := os.Create(fmt.Sprintf("%s/%s", downloadFolder, fileName))
-
 			// out, err := os.Create(fileName)
 			if err != nil {
 				fmt.Println(err)
@@ -104,14 +109,16 @@ var getCmd = &cobra.Command{
 			defer out.Close()
 
 			// Writer the body to file
-			_, err = io.Copy(out, response.Body)
+			_, err = io.Copy(out, res.Body)
 			if err != nil {
 				fmt.Println(err)
 			}
 
 			// Get Merkle Proof
-			mp := response.Header.Get("Merkle-Proof")
-			merkleProofs := strings.SplitAfter(strings.Replace(strings.Replace(strings.Replace(mp, "[", "", -1), "]", "", -1), "\"", "", -1), " ")
+			mp := res.Header.Get("Merkle-Proof")
+			// FIX:wrapperFunc: use strings.ReplaceAll method in `strings.Replace(mp, "[", "", -1)` (gocritic)
+			merkleProofs := strings.SplitAfter(strings.ReplaceAll(strings.ReplaceAll(strings.ReplaceAll(mp, "[", ""), "]", ""), "\"", ""), " ")
+
 			for k, v := range merkleProofs {
 				log.Printf("proof %v: %s", k, v)
 			}
