@@ -12,9 +12,7 @@ const (
 	test3FilesPath = "./testfiles/3files"
 )
 
-var (
-	mu sync.Mutex
-)
+var mu sync.Mutex
 
 func Test_createMerkleTree(t *testing.T) {
 	type args struct {
@@ -247,7 +245,6 @@ func Test_createMerkleProofM(t *testing.T) {
 		// 		t.Errorf("createMerkleProof() = %v, want %v", got, tt.want)
 		// 	}
 		// })
-
 	}
 }
 
@@ -453,12 +450,11 @@ func TestComputeMerkleTree(t *testing.T) {
 			}
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("ComputeMerkleTree() = %v, want %v", got, tt.want)
-
 			}
 		})
 	}
-
 }
+
 func TestComputeRootHash(t *testing.T) {
 	mu.Lock()
 	defer mu.Unlock()
@@ -474,7 +470,6 @@ func TestComputeRootHash(t *testing.T) {
 		filePath := fmt.Sprintf("%s/%s", test3FilesPath, f.Name())
 		ff, err := os.Open(filePath)
 		if err != nil {
-
 			fmt.Println(err)
 			return
 		}
@@ -509,11 +504,9 @@ func TestComputeRootHash(t *testing.T) {
 			}
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("ComputeMerkleTree() = %v, want %v", got, tt.want)
-
 			}
 		})
 	}
-
 }
 
 func TestComputeMerkleProof(t *testing.T) {
@@ -521,7 +514,6 @@ func TestComputeMerkleProof(t *testing.T) {
 	defer mu.Unlock()
 	files, err := os.ReadDir(test3FilesPath)
 	if err != nil {
-
 		fmt.Println(err)
 		return
 	}
@@ -531,7 +523,6 @@ func TestComputeMerkleProof(t *testing.T) {
 		filePath := fmt.Sprintf("%s/%s", test3FilesPath, f.Name())
 		ff, err := os.Open(filePath)
 		if err != nil {
-
 			fmt.Println(err)
 			return
 		}
@@ -606,7 +597,6 @@ func TestReconstructRootHash(t *testing.T) {
 	// defer
 	files, err := os.ReadDir(test3FilesPath)
 	if err != nil {
-
 		fmt.Println(err)
 		return
 	}
@@ -616,7 +606,6 @@ func TestReconstructRootHash(t *testing.T) {
 		filePath := fmt.Sprintf("%s/%s", test3FilesPath, f.Name())
 		ff, err := os.Open(filePath)
 		if err != nil {
-
 			fmt.Println(err)
 			return
 		}
@@ -677,11 +666,9 @@ func TestReconstructRootHash(t *testing.T) {
 			}
 			if got != tt.want {
 				t.Errorf("ReconstructRootHash() = %v, want %v", got, tt.want)
-
 			}
 		})
 	}
-
 }
 
 func TestIsFileCorrect(t *testing.T) {
@@ -768,5 +755,4 @@ func TestIsFileCorrect(t *testing.T) {
 			}
 		})
 	}
-
 }

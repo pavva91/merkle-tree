@@ -43,7 +43,7 @@ func createMerkleProof(hashLeaf string, merkleTree MerkleTree) (merkleProofs []s
 	for i := 0; i < int(lengthMerkleProofs); i++ {
 		iProof := 1 - (indexLeaf % 2)
 		iProofs = append(iProofs, iProof)
-		indexLeaf = indexLeaf / 2
+		indexLeaf /= 2
 	}
 
 	slices.Reverse(iProofs)
@@ -72,14 +72,13 @@ func createLeavesNodes(hashLeaves []string) []*BinaryNode {
 	if n%2 != 0 {
 		hashLeaves = append(hashLeaves, hashLeaves[n-1])
 	}
-	for i := 0; i < n; i = i + 1 {
-
-		leafNode := *&BinaryNode{
+	for i := 0; i < n; i++ {
+		leafNode := &BinaryNode{
 			Value:     hashLeaves[i],
 			LeftNode:  nil,
 			RightNode: nil,
 		}
-		leavesNodes = append(leavesNodes, &leafNode)
+		leavesNodes = append(leavesNodes, leafNode)
 	}
 	return leavesNodes
 }
@@ -96,10 +95,10 @@ func calcMT(hashNodes []*BinaryNode) []*BinaryNode {
 	if n%2 != 0 {
 		hashNodes = append(hashNodes, hashNodes[n-1])
 	}
-	for i := 0; i < n; i = i + 2 {
+	for i := 0; i < n; i += 2 {
 		node1 := hashNodes[i]
 		node2 := hashNodes[i+1]
-		newNode := *&BinaryNode{}
+		newNode := &BinaryNode{}
 		pair := calculateHashPair(node1.Value, node2.Value)
 
 		h := sha256.New()
@@ -109,7 +108,7 @@ func calcMT(hashNodes []*BinaryNode) []*BinaryNode {
 		newNode.Value = nextHash
 		newNode.LeftNode = node1
 		newNode.RightNode = node2
-		higherLevelNodes = append(higherLevelNodes, &newNode)
+		higherLevelNodes = append(higherLevelNodes, newNode)
 	}
 
 	return calcMT(higherLevelNodes)

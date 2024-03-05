@@ -68,10 +68,8 @@ func calculateHashPair(h1 string, h2 string) string {
 	pair := ""
 	if h1 > h2 {
 		pair = fmt.Sprintf("%s%s", h1, h2)
-
 	} else {
 		pair = fmt.Sprintf("%s%s", h2, h1)
-
 	}
 	return pair
 }
@@ -107,10 +105,9 @@ func createMerkleProofMatrix(hashFile string, merkleTree [][]string) (merkleProo
 				} else {
 					merkleProofs = append(merkleProofs, merkleTree[j][i-1])
 				}
-				i = i / 2
+				i /= 2
 			}
 		}
-
 	}
 
 	return merkleProofs
@@ -167,7 +164,7 @@ func createMerkleTree(hashLeaves []string) [][]string {
 			merkleTree[i] = append(merkleTree[i], merkleTree[i][len(merkleTree[i])-1])
 		}
 		var upperLevelMerkleTree []string
-		for j := 0; j < len(merkleTree[i]); j = j + 2 {
+		for j := 0; j < len(merkleTree[i]); j += 2 {
 			fmt.Printf("hash i: %v, j: %v = %s\n", i, j, merkleTree[i][j])
 			fmt.Printf("hash i: %v, j: %v = %s\n", i, j+1, merkleTree[i][j+1])
 
