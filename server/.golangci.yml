@@ -1,18 +1,42 @@
 linters:
-  # enable-all: true
-  enable-all: false
-  disable:
-    # deprecated
-    - maligned
-    - deadcode
-    - structcheck
-    - interfacer
-    - ifshort
-    - exhaustivestruct
-    - nosnakecase
-    - golint
-    - varcheck
-    - scopelint
+  disable-all: true
+  enable:
+    # go-ethereum
+    - goimports
+    - gosimple
+    - govet
+    - ineffassign
+    - misspell
+    - unconvert
+    - typecheck
+    - unused
+    - staticcheck
+    - bidichk
+    - durationcheck
+    - exportloopref
+    - whitespace
 
-    # too much noise
-    - tagalign
+
+    # cosmos sdk
+    - dogsled
+    - errcheck
+    - exportloopref
+    - gci
+    - goconst
+    - gocritic
+    - gofumpt
+    - gosec
+    - gosimple
+    - govet
+    - ineffassign
+    - misspell
+    - nakedret
+    - nolintlint
+    - revive
+    - staticcheck
+    - stylecheck
+    - thelper
+    - typecheck
+    - unconvert
+    - unused
+
