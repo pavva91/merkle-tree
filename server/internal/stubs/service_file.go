@@ -22,6 +22,7 @@ func (stub FileService) SaveBulk(files []*multipart.FileHeader) error {
 func (stub FileService) GetByName(fileName string) ([]byte, string, error) {
 	return stub.GetByNameFn(fileName)
 }
+
 func (stub FileService) List() ([]string, error) {
 	return stub.ListFn()
 }

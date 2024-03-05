@@ -10,9 +10,7 @@ import (
 	"github.com/pavva91/merkle-tree/server/internal/repositories"
 )
 
-var (
-	MerkleTree MerkleTreer = merkleT{}
-)
+var MerkleTree MerkleTreer = merkleT{}
 
 type MerkleTreer interface {
 	Create() (*models.MerkleTree, error)

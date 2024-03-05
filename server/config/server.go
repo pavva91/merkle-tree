@@ -5,8 +5,8 @@ var Values ServerConfig
 // Model that links to config.yml file
 type ServerConfig struct {
 	Server struct {
-		ApiPath            string   `yaml:"api-path"  env:"API_PATH" env-description:"API base path"`
-		ApiVersion         string   `yaml:"api-version"  env:"API_VERSION" env-description:"API Version"`
+		APIPath            string   `yaml:"api-path"  env:"API_PATH" env-description:"API base path"`
+		APIVersion         string   `yaml:"api-version"  env:"API_VERSION" env-description:"API Version"`
 		CorsAllowedClients []string `yaml:"cors-allowed-clients" env:"CORS_ALLOWED_CLIENTS"  env-description:"List of allowed CORS Clients"`
 		Environment        string   `yaml:"environment" env:"SERVER_ENVIRONMENT"  env-description:"server environment"`
 
