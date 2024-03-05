@@ -15,9 +15,9 @@ services:
       - MAX_BULK_UPLOAD_SIZE=33554432 # 32MB
       - MAX_UPLOAD_FILE_SIZE=2097152 # 2MB
       - UPLOAD_FOLDER=./uploads
-    # ports:
-      # - "${PORT}:${PORT}"
-      # - 8080:8080
+    ports:
+      - "${PORT}:${PORT}"
+      - 8080:8080
   client:
     depends_on:
       - server
