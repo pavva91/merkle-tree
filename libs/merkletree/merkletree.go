@@ -66,6 +66,32 @@ func createMerkleProof(hashLeaf string, merkleTree MerkleTree) (merkleProofs []s
 	return merkleProofs
 }
 
+// 1 : left
+// 0 : right
+func getNodesPositions(indexLeaf int, n int) (nodePositions []int) {
+	log2n := math.Log2(float64(n))
+	lengthMerkleProofs := math.Ceil(log2n)
+
+	for i := 0; i < int(lengthMerkleProofs); i++ {
+		iProof := 1 - (indexLeaf % 2)
+		nodePositions = append(nodePositions, iProof)
+		indexLeaf /= 2
+	}
+	return nodePositions
+}
+
+// returns -1 if not found
+func getLeafIndex(hashLeaves []string, hashLeaf string) int {
+	indexLeaf := -1
+	for k, v := range hashLeaves {
+		if v == hashLeaf {
+			indexLeaf = k
+		}
+	}
+
+	return indexLeaf
+}
+
 func createLeavesNodes(hashLeaves []string) []*BinaryNode {
 	leavesNodes := []*BinaryNode{}
 	n := len(hashLeaves)
@@ -96,18 +122,20 @@ func calcMT(hashNodes []*BinaryNode) []*BinaryNode {
 		hashNodes = append(hashNodes, hashNodes[n-1])
 	}
 	for i := 0; i < n; i += 2 {
-		node1 := hashNodes[i]
-		node2 := hashNodes[i+1]
+		leftNode := hashNodes[i]
+		rightNode := hashNodes[i+1]
 		newNode := &BinaryNode{}
-		pair := calculateHashPair(node1.Value, node2.Value)
+		pair := fmt.Sprintf("%s%s", leftNode.Value, rightNode.Value)
+		fmt.Println("pair:", pair)
 
 		h := sha256.New()
 		h.Write([]byte(pair))
 		nextHash := fmt.Sprintf("%x", h.Sum(nil))
+		fmt.Println("nextHash:", nextHash)
 
 		newNode.Value = nextHash
-		newNode.LeftNode = node1
-		newNode.RightNode = node2
+		newNode.LeftNode = leftNode
+		newNode.RightNode = rightNode
 		higherLevelNodes = append(higherLevelNodes, newNode)
 	}
 

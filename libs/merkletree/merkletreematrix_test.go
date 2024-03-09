@@ -14,6 +14,22 @@ const (
 
 var mu sync.Mutex
 
+var merkleTree3HashesM = [][]string{
+	{"0dffefeae189629164f222e18c83883c1fd9b5b02eb55d5ca99bd207ebcf882d", "f8addeff4cc29a9a55589ae001e2230ecd7a515de5be7eeb27da1cabba87fbe6", "34575cdd0f12f999e0fc36ef7d70bbd5d302b9bca1a24a0712f505f490cf7a52", "34575cdd0f12f999e0fc36ef7d70bbd5d302b9bca1a24a0712f505f490cf7a52"},
+	{"e2abf2fd16b981a59d8ecf4a9a0ac0498c715e45801e29f0152cefad8c6f87f4", "dfa84bc707cd740d3551233bfda2cfa6df519d1e7e7174882efa7dc3cdab2286"},
+	{hashRoot3Hashes},
+}
+
+var hashRoot3Hashes = "b2a1f9e0a30ae91c0b6b70eacb673e4e030f3d5199ec0a0f0ed64ad45c0ca7f4"
+
+var merkleTree3StringsM = [][]string{
+	{"h1", "h2", "h3", "h3"},
+	{"dac079ce8e97c5434424c28112b96e601aa4ff36ba0377619b9e38f473310cf3", "f858727943465ed9759534a90713a9da630425509eaf13633d9c3229434490ff"},
+	{hashRoot3Strings},
+}
+
+var hashRoot3Strings = "4279484b826df5de36382d7cf13be9a59ea62f7bc986d257c038d0bd9df207e2"
+
 func Test_createMerkleTree(t *testing.T) {
 	type args struct {
 		hashLeaves []string
@@ -31,7 +47,7 @@ func Test_createMerkleTree(t *testing.T) {
 			},
 			[][]string{
 				{"h1", "h2"},
-				{"a96fa9a8ec57366442ecb3d70cc3039b7107543c0bf197828f80a9091c29491f"},
+				{"dac079ce8e97c5434424c28112b96e601aa4ff36ba0377619b9e38f473310cf3"},
 			},
 		},
 		"3 string hashes": {
@@ -42,11 +58,7 @@ func Test_createMerkleTree(t *testing.T) {
 					"h3",
 				},
 			},
-			[][]string{
-				{"h1", "h2", "h3", "h3"},
-				{"a96fa9a8ec57366442ecb3d70cc3039b7107543c0bf197828f80a9091c29491f", "f858727943465ed9759534a90713a9da630425509eaf13633d9c3229434490ff"},
-				{"7728ad37f4999f80c92c7d45b32b63faf5934cf7549176cef0b0d15ecf0447f8"},
-			},
+			merkleTree3StringsM,
 		},
 		"3 string real hashes": {
 			args{
@@ -56,11 +68,7 @@ func Test_createMerkleTree(t *testing.T) {
 					"34575cdd0f12f999e0fc36ef7d70bbd5d302b9bca1a24a0712f505f490cf7a52", // f3
 				},
 			},
-			[][]string{
-				{"0dffefeae189629164f222e18c83883c1fd9b5b02eb55d5ca99bd207ebcf882d", "f8addeff4cc29a9a55589ae001e2230ecd7a515de5be7eeb27da1cabba87fbe6", "34575cdd0f12f999e0fc36ef7d70bbd5d302b9bca1a24a0712f505f490cf7a52", "34575cdd0f12f999e0fc36ef7d70bbd5d302b9bca1a24a0712f505f490cf7a52"},
-				{"26b28d79c60bda9bbec02d214d5defe3e21075276927239729cb2c01d9931acc", "dfa84bc707cd740d3551233bfda2cfa6df519d1e7e7174882efa7dc3cdab2286"},
-				{"5880895435d8c5d8c8b549b520ef550882ab0245e1b241594c44ddffe5a6a8c0"},
-			},
+			merkleTree3HashesM,
 		},
 		"5 string hashes": {
 			args{
@@ -74,9 +82,9 @@ func Test_createMerkleTree(t *testing.T) {
 			},
 			[][]string{
 				{"h1", "h2", "h3", "h4", "h5", "h5"},
-				{"a96fa9a8ec57366442ecb3d70cc3039b7107543c0bf197828f80a9091c29491f", "011676a9c0ad9df8158321c9f291f0ef3ffcd66ad93f2583a94c29d960b25d8f", "77c1e48fb22fdbd534fd76bc0b8fa98745e113634512b7171ceaae33b097e6fd", "77c1e48fb22fdbd534fd76bc0b8fa98745e113634512b7171ceaae33b097e6fd"},
-				{"6c43537d3e6822f2e9e1b3d748c7bed78672f619e0e2383ce3e7483202cc9712", "3a31f2d07d9715bc3e48106ecbdcb02e2081e96d3537a47b54975a0c52be66b7"},
-				{"670aef0f2c3152520e90594f6d0c3e44487fead6a5b3a17ef09aebb365b4d72e"},
+				{"dac079ce8e97c5434424c28112b96e601aa4ff36ba0377619b9e38f473310cf3", "55c82a1f310283eefe23c4e02d409428fb0e768551eb4845291ed67ac2b16ec3", "77c1e48fb22fdbd534fd76bc0b8fa98745e113634512b7171ceaae33b097e6fd", "77c1e48fb22fdbd534fd76bc0b8fa98745e113634512b7171ceaae33b097e6fd"},
+				{"c14124471a06847b5042b48aa94ece8030e2a21fbcf2927e2741ef2602f37363", "3a31f2d07d9715bc3e48106ecbdcb02e2081e96d3537a47b54975a0c52be66b7"},
+				{"12761d3647c296c8a6e39bb363652479da1e95382128ba28c6eb0e79ee74a97a"},
 			},
 		},
 	}
@@ -122,11 +130,7 @@ func Test_createMerkleProofM(t *testing.T) {
 		},
 		"3 string hashes, not found": {
 			args{
-				merkleTree: [][]string{
-					{"h1", "h2", "h3", "h3"},
-					{"dac079ce8e97c5434424c28112b96e601aa4ff36ba0377619b9e38f473310cf3", "f858727943465ed9759534a90713a9da630425509eaf13633d9c3229434490ff"},
-					{"4279484b826df5de36382d7cf13be9a59ea62f7bc986d257c038d0bd9df207e2"},
-				},
+				merkleTree: merkleTree3HashesM,
 
 				hashFile: "h4",
 			},
@@ -134,13 +138,8 @@ func Test_createMerkleProofM(t *testing.T) {
 		},
 		"3 string hashes, found f1": {
 			args{
-				merkleTree: [][]string{
-					{"0dffefeae189629164f222e18c83883c1fd9b5b02eb55d5ca99bd207ebcf882d", "f8addeff4cc29a9a55589ae001e2230ecd7a515de5be7eeb27da1cabba87fbe6", "34575cdd0f12f999e0fc36ef7d70bbd5d302b9bca1a24a0712f505f490cf7a52", "34575cdd0f12f999e0fc36ef7d70bbd5d302b9bca1a24a0712f505f490cf7a52"},
-					{"26b28d79c60bda9bbec02d214d5defe3e21075276927239729cb2c01d9931acc", "dfa84bc707cd740d3551233bfda2cfa6df519d1e7e7174882efa7dc3cdab2286"},
-					{"5880895435d8c5d8c8b549b520ef550882ab0245e1b241594c44ddffe5a6a8c0"},
-				},
-
-				hashFile: "0dffefeae189629164f222e18c83883c1fd9b5b02eb55d5ca99bd207ebcf882d", // f1
+				merkleTree: merkleTree3HashesM,
+				hashFile:   "0dffefeae189629164f222e18c83883c1fd9b5b02eb55d5ca99bd207ebcf882d", // f1
 			},
 			[]string{
 				"f8addeff4cc29a9a55589ae001e2230ecd7a515de5be7eeb27da1cabba87fbe6",
@@ -149,13 +148,8 @@ func Test_createMerkleProofM(t *testing.T) {
 		},
 		"3 string hashes, found f2": {
 			args{
-				merkleTree: [][]string{
-					{"0dffefeae189629164f222e18c83883c1fd9b5b02eb55d5ca99bd207ebcf882d", "f8addeff4cc29a9a55589ae001e2230ecd7a515de5be7eeb27da1cabba87fbe6", "34575cdd0f12f999e0fc36ef7d70bbd5d302b9bca1a24a0712f505f490cf7a52", "34575cdd0f12f999e0fc36ef7d70bbd5d302b9bca1a24a0712f505f490cf7a52"},
-					{"26b28d79c60bda9bbec02d214d5defe3e21075276927239729cb2c01d9931acc", "dfa84bc707cd740d3551233bfda2cfa6df519d1e7e7174882efa7dc3cdab2286"},
-					{"5880895435d8c5d8c8b549b520ef550882ab0245e1b241594c44ddffe5a6a8c0"},
-				},
-
-				hashFile: "f8addeff4cc29a9a55589ae001e2230ecd7a515de5be7eeb27da1cabba87fbe6", // f2
+				merkleTree: merkleTree3HashesM,
+				hashFile:   "f8addeff4cc29a9a55589ae001e2230ecd7a515de5be7eeb27da1cabba87fbe6", // f2
 			},
 			[]string{
 				"0dffefeae189629164f222e18c83883c1fd9b5b02eb55d5ca99bd207ebcf882d",
@@ -164,17 +158,12 @@ func Test_createMerkleProofM(t *testing.T) {
 		},
 		"3 string hashes, found f3": {
 			args{
-				merkleTree: [][]string{
-					{"0dffefeae189629164f222e18c83883c1fd9b5b02eb55d5ca99bd207ebcf882d", "f8addeff4cc29a9a55589ae001e2230ecd7a515de5be7eeb27da1cabba87fbe6", "34575cdd0f12f999e0fc36ef7d70bbd5d302b9bca1a24a0712f505f490cf7a52", "34575cdd0f12f999e0fc36ef7d70bbd5d302b9bca1a24a0712f505f490cf7a52"},
-					{"26b28d79c60bda9bbec02d214d5defe3e21075276927239729cb2c01d9931acc", "dfa84bc707cd740d3551233bfda2cfa6df519d1e7e7174882efa7dc3cdab2286"},
-					{"5880895435d8c5d8c8b549b520ef550882ab0245e1b241594c44ddffe5a6a8c0"},
-				},
-
-				hashFile: "34575cdd0f12f999e0fc36ef7d70bbd5d302b9bca1a24a0712f505f490cf7a52", // f3
+				merkleTree: merkleTree3HashesM,
+				hashFile:   "34575cdd0f12f999e0fc36ef7d70bbd5d302b9bca1a24a0712f505f490cf7a52", // f3
 			},
 			[]string{
 				"34575cdd0f12f999e0fc36ef7d70bbd5d302b9bca1a24a0712f505f490cf7a52",
-				"26b28d79c60bda9bbec02d214d5defe3e21075276927239729cb2c01d9931acc",
+				"e2abf2fd16b981a59d8ecf4a9a0ac0498c715e45801e29f0152cefad8c6f87f4",
 			},
 		},
 		"5 string hashes, found h2": {
@@ -248,57 +237,13 @@ func Test_createMerkleProofM(t *testing.T) {
 	}
 }
 
-func Test_calculateHashPair(t *testing.T) {
-	type args struct {
-		h1 string
-		h2 string
-	}
-	tests := map[string]struct {
-		args args
-		want string
-	}{
-		"test reverse (ascii code) order": {
-			args{
-				h1: "aaaa",
-				h2: "bbbb",
-			},
-			"bbbbaaaa",
-		},
-		"test in correct (ascii code) order": {
-			args{
-				h1: "bbbb",
-				h2: "aaaa",
-			},
-			"bbbbaaaa",
-		},
-		"test in order, real hash": {
-			args{
-				h1: "f8addeff4cc29a9a55589ae001e2230ecd7a515de5be7eeb27da1cabba87fbe6",
-				h2: "0dffefeae189629164f222e18c83883c1fd9b5b02eb55d5ca99bd207ebcf882d",
-			},
-			"f8addeff4cc29a9a55589ae001e2230ecd7a515de5be7eeb27da1cabba87fbe60dffefeae189629164f222e18c83883c1fd9b5b02eb55d5ca99bd207ebcf882d",
-		},
-		"test reverse order, real hash": {
-			args{
-				h1: "0dffefeae189629164f222e18c83883c1fd9b5b02eb55d5ca99bd207ebcf882d",
-				h2: "f8addeff4cc29a9a55589ae001e2230ecd7a515de5be7eeb27da1cabba87fbe6",
-			},
-			"f8addeff4cc29a9a55589ae001e2230ecd7a515de5be7eeb27da1cabba87fbe60dffefeae189629164f222e18c83883c1fd9b5b02eb55d5ca99bd207ebcf882d",
-		},
-	}
-	for name, tt := range tests {
-		t.Run(name, func(t *testing.T) {
-			if got := calculateHashPair(tt.args.h1, tt.args.h2); got != tt.want {
-				t.Errorf("calculateHashPair() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
+// 0 : right
+// 1 : left
 func Test_reconstructRootHash(t *testing.T) {
 	type args struct {
 		hashLeaf     string
 		merkleProofs []string
+		fileOrder    int
 	}
 	tests := map[string]struct {
 		args args
@@ -311,8 +256,9 @@ func Test_reconstructRootHash(t *testing.T) {
 					"f8addeff4cc29a9a55589ae001e2230ecd7a515de5be7eeb27da1cabba87fbe6",
 					"dfa84bc707cd740d3551233bfda2cfa6df519d1e7e7174882efa7dc3cdab2286",
 				},
+				fileOrder: 0,
 			},
-			"5880895435d8c5d8c8b549b520ef550882ab0245e1b241594c44ddffe5a6a8c0",
+			hashRoot3Hashes,
 		},
 		"test hash f1, with not correct proofs, reconstruct not correct rootHash": {
 			args{
@@ -321,8 +267,9 @@ func Test_reconstructRootHash(t *testing.T) {
 					"f8addeff4cc29a9a55589ae001e2230ecd7a515de5be7eeb27da1cabba87fbe7",
 					"dfa84bc707cd740d3551233bfda2cfa6df519d1e7e7174882efa7dc3cdab2286",
 				},
+				fileOrder: 0,
 			},
-			"d7b975d9510021f16925d48e12ad209ad64c178e8c6f930a4ff67bffd1ac177e",
+			"2a6820a743f3d68416e37cc1d0088b39556ad4c63b23a2e7044a7eea287e5ee5",
 		},
 		"test f2 (3 string hashes), with correct proofs, reconstruct correct rootHash": {
 			args{
@@ -331,23 +278,25 @@ func Test_reconstructRootHash(t *testing.T) {
 					"0dffefeae189629164f222e18c83883c1fd9b5b02eb55d5ca99bd207ebcf882d",
 					"dfa84bc707cd740d3551233bfda2cfa6df519d1e7e7174882efa7dc3cdab2286",
 				},
+				fileOrder: 1,
 			},
-			"5880895435d8c5d8c8b549b520ef550882ab0245e1b241594c44ddffe5a6a8c0",
+			hashRoot3Hashes,
 		},
 		"test f3 (3 string hashes), with correct proofs, reconstruct correct rootHash": {
 			args{
 				hashLeaf: "34575cdd0f12f999e0fc36ef7d70bbd5d302b9bca1a24a0712f505f490cf7a52", // f1
 				merkleProofs: []string{
 					"34575cdd0f12f999e0fc36ef7d70bbd5d302b9bca1a24a0712f505f490cf7a52",
-					"26b28d79c60bda9bbec02d214d5defe3e21075276927239729cb2c01d9931acc",
+					"e2abf2fd16b981a59d8ecf4a9a0ac0498c715e45801e29f0152cefad8c6f87f4",
 				},
+				fileOrder: 2,
 			},
-			"5880895435d8c5d8c8b549b520ef550882ab0245e1b241594c44ddffe5a6a8c0",
+			hashRoot3Hashes,
 		},
 	}
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {
-			if got := reconstructRootHash(tt.args.hashLeaf, tt.args.merkleProofs); got != tt.want {
+			if got := reconstructRootHash(tt.args.hashLeaf, tt.args.merkleProofs, tt.args.fileOrder); got != tt.want {
 				t.Errorf("ReconstructRootHash() = %v, want %v", got, tt.want)
 			}
 		})
@@ -359,6 +308,7 @@ func Test_isHashFileCorrect(t *testing.T) {
 		hashFile       string
 		merkleProofs   []string
 		wantedRootHash string
+		fileOrder      int
 	}
 	tests := map[string]struct {
 		args args
@@ -371,7 +321,8 @@ func Test_isHashFileCorrect(t *testing.T) {
 					"f8addeff4cc29a9a55589ae001e2230ecd7a515de5be7eeb27da1cabba87fbe6",
 					"dfa84bc707cd740d3551233bfda2cfa6df519d1e7e7174882efa7dc3cdab2286",
 				},
-				wantedRootHash: "5880895435d8c5d8c8b549b520ef550882ab0245e1b241594c44ddffe5a6a8c0",
+				wantedRootHash: hashRoot3Hashes,
+				fileOrder:      0,
 			},
 			true,
 		},
@@ -382,14 +333,15 @@ func Test_isHashFileCorrect(t *testing.T) {
 					"f8addeff4cc29a9a55589ae001e2230ecd7a515de5be7eeb27da1cabba87fbe7",
 					"dfa84bc707cd740d3551233bfda2cfa6df519d1e7e7174882efa7dc3cdab2286",
 				},
-				wantedRootHash: "5880895435d8c5d8c8b549b520ef550882ab0245e1b241594c44ddffe5a6a8c0",
+				wantedRootHash: hashRoot3Hashes,
+				fileOrder:      0,
 			},
 			false,
 		},
 	}
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {
-			if got := isHashFileCorrect(tt.args.hashFile, tt.args.merkleProofs, tt.args.wantedRootHash); got != tt.want {
+			if got := isHashFileCorrect(tt.args.hashFile, tt.args.merkleProofs, tt.args.wantedRootHash, tt.args.fileOrder); got != tt.want {
 				t.Errorf("Verify() = %v, want %v", got, tt.want)
 			}
 		})
@@ -432,11 +384,7 @@ func TestComputeMerkleTree(t *testing.T) {
 			args{
 				files: fFiles,
 			},
-			[][]string{
-				{"0dffefeae189629164f222e18c83883c1fd9b5b02eb55d5ca99bd207ebcf882d", "f8addeff4cc29a9a55589ae001e2230ecd7a515de5be7eeb27da1cabba87fbe6", "34575cdd0f12f999e0fc36ef7d70bbd5d302b9bca1a24a0712f505f490cf7a52", "34575cdd0f12f999e0fc36ef7d70bbd5d302b9bca1a24a0712f505f490cf7a52"},
-				{"26b28d79c60bda9bbec02d214d5defe3e21075276927239729cb2c01d9931acc", "dfa84bc707cd740d3551233bfda2cfa6df519d1e7e7174882efa7dc3cdab2286"},
-				{"5880895435d8c5d8c8b549b520ef550882ab0245e1b241594c44ddffe5a6a8c0"},
-			},
+			merkleTree3HashesM,
 			false,
 		},
 	}
@@ -490,7 +438,7 @@ func TestComputeRootHash(t *testing.T) {
 			args{
 				files: fFiles,
 			},
-			"5880895435d8c5d8c8b549b520ef550882ab0245e1b241594c44ddffe5a6a8c0",
+			hashRoot3Hashes,
 			false,
 		},
 	}
@@ -512,6 +460,7 @@ func TestComputeRootHash(t *testing.T) {
 func TestComputeMerkleProof(t *testing.T) {
 	mu.Lock()
 	defer mu.Unlock()
+
 	files, err := os.ReadDir(test3FilesPath)
 	if err != nil {
 		fmt.Println(err)
@@ -540,12 +489,8 @@ func TestComputeMerkleProof(t *testing.T) {
 	}{
 		"find first file (f1)": {
 			args{
-				file: fFiles[0],
-				merkleTree: [][]string{
-					{"0dffefeae189629164f222e18c83883c1fd9b5b02eb55d5ca99bd207ebcf882d", "f8addeff4cc29a9a55589ae001e2230ecd7a515de5be7eeb27da1cabba87fbe6", "34575cdd0f12f999e0fc36ef7d70bbd5d302b9bca1a24a0712f505f490cf7a52", "34575cdd0f12f999e0fc36ef7d70bbd5d302b9bca1a24a0712f505f490cf7a52"},
-					{"26b28d79c60bda9bbec02d214d5defe3e21075276927239729cb2c01d9931acc", "dfa84bc707cd740d3551233bfda2cfa6df519d1e7e7174882efa7dc3cdab2286"},
-					{"5880895435d8c5d8c8b549b520ef550882ab0245e1b241594c44ddffe5a6a8c0"},
-				},
+				file:       fFiles[0],
+				merkleTree: merkleTree3HashesM,
 			},
 			[]string{
 				"f8addeff4cc29a9a55589ae001e2230ecd7a515de5be7eeb27da1cabba87fbe6",
@@ -554,12 +499,8 @@ func TestComputeMerkleProof(t *testing.T) {
 		},
 		"find second file (f2)": {
 			args{
-				file: fFiles[1],
-				merkleTree: [][]string{
-					{"0dffefeae189629164f222e18c83883c1fd9b5b02eb55d5ca99bd207ebcf882d", "f8addeff4cc29a9a55589ae001e2230ecd7a515de5be7eeb27da1cabba87fbe6", "34575cdd0f12f999e0fc36ef7d70bbd5d302b9bca1a24a0712f505f490cf7a52", "34575cdd0f12f999e0fc36ef7d70bbd5d302b9bca1a24a0712f505f490cf7a52"},
-					{"26b28d79c60bda9bbec02d214d5defe3e21075276927239729cb2c01d9931acc", "dfa84bc707cd740d3551233bfda2cfa6df519d1e7e7174882efa7dc3cdab2286"},
-					{"5880895435d8c5d8c8b549b520ef550882ab0245e1b241594c44ddffe5a6a8c0"},
-				},
+				file:       fFiles[1],
+				merkleTree: merkleTree3HashesM,
 			},
 			[]string{
 				"0dffefeae189629164f222e18c83883c1fd9b5b02eb55d5ca99bd207ebcf882d",
@@ -569,15 +510,16 @@ func TestComputeMerkleProof(t *testing.T) {
 		"find third file (f3)": {
 			args{
 				file: fFiles[2],
-				merkleTree: [][]string{
-					{"0dffefeae189629164f222e18c83883c1fd9b5b02eb55d5ca99bd207ebcf882d", "f8addeff4cc29a9a55589ae001e2230ecd7a515de5be7eeb27da1cabba87fbe6", "34575cdd0f12f999e0fc36ef7d70bbd5d302b9bca1a24a0712f505f490cf7a52", "34575cdd0f12f999e0fc36ef7d70bbd5d302b9bca1a24a0712f505f490cf7a52"},
-					{"26b28d79c60bda9bbec02d214d5defe3e21075276927239729cb2c01d9931acc", "dfa84bc707cd740d3551233bfda2cfa6df519d1e7e7174882efa7dc3cdab2286"},
-					{"5880895435d8c5d8c8b549b520ef550882ab0245e1b241594c44ddffe5a6a8c0"},
-				},
+				// merkleTree: [][]string{
+				// 	{"0dffefeae189629164f222e18c83883c1fd9b5b02eb55d5ca99bd207ebcf882d", "f8addeff4cc29a9a55589ae001e2230ecd7a515de5be7eeb27da1cabba87fbe6", "34575cdd0f12f999e0fc36ef7d70bbd5d302b9bca1a24a0712f505f490cf7a52", "34575cdd0f12f999e0fc36ef7d70bbd5d302b9bca1a24a0712f505f490cf7a52"},
+				// 	{"26b28d79c60bda9bbec02d214d5defe3e21075276927239729cb2c01d9931acc", "dfa84bc707cd740d3551233bfda2cfa6df519d1e7e7174882efa7dc3cdab2286"},
+				// 	{"5880895435d8c5d8c8b549b520ef550882ab0245e1b241594c44ddffe5a6a8c0"},
+				// },
+				merkleTree: merkleTree3HashesM,
 			},
 			[]string{
 				"34575cdd0f12f999e0fc36ef7d70bbd5d302b9bca1a24a0712f505f490cf7a52",
-				"26b28d79c60bda9bbec02d214d5defe3e21075276927239729cb2c01d9931acc",
+				"e2abf2fd16b981a59d8ecf4a9a0ac0498c715e45801e29f0152cefad8c6f87f4",
 			},
 		},
 	}
@@ -614,8 +556,10 @@ func TestReconstructRootHash(t *testing.T) {
 	}
 
 	type args struct {
-		file         *os.File
-		merkleProofs []string
+		file           *os.File
+		merkleProofs   []string
+		fileOrder      int
+		numberOfLeaves int
 	}
 	tests := map[string]struct {
 		args    args
@@ -629,8 +573,9 @@ func TestReconstructRootHash(t *testing.T) {
 					"f8addeff4cc29a9a55589ae001e2230ecd7a515de5be7eeb27da1cabba87fbe6",
 					"dfa84bc707cd740d3551233bfda2cfa6df519d1e7e7174882efa7dc3cdab2286",
 				},
+				fileOrder: 0,
 			},
-			"5880895435d8c5d8c8b549b520ef550882ab0245e1b241594c44ddffe5a6a8c0",
+			hashRoot3Hashes,
 			false,
 		},
 		"test f2, with correct proofs, reconstruct correct rootHash": {
@@ -640,8 +585,9 @@ func TestReconstructRootHash(t *testing.T) {
 					"0dffefeae189629164f222e18c83883c1fd9b5b02eb55d5ca99bd207ebcf882d",
 					"dfa84bc707cd740d3551233bfda2cfa6df519d1e7e7174882efa7dc3cdab2286",
 				},
+				fileOrder: 1,
 			},
-			"5880895435d8c5d8c8b549b520ef550882ab0245e1b241594c44ddffe5a6a8c0",
+			hashRoot3Hashes,
 			false,
 		},
 		"test f3, with correct proofs, reconstruct correct rootHash": {
@@ -649,16 +595,17 @@ func TestReconstructRootHash(t *testing.T) {
 				file: fFiles[2],
 				merkleProofs: []string{
 					"34575cdd0f12f999e0fc36ef7d70bbd5d302b9bca1a24a0712f505f490cf7a52",
-					"26b28d79c60bda9bbec02d214d5defe3e21075276927239729cb2c01d9931acc",
+					"e2abf2fd16b981a59d8ecf4a9a0ac0498c715e45801e29f0152cefad8c6f87f4",
 				},
+				fileOrder: 2,
 			},
-			"5880895435d8c5d8c8b549b520ef550882ab0245e1b241594c44ddffe5a6a8c0",
+			hashRoot3Hashes,
 			false,
 		},
 	}
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {
-			got, err := ReconstructRootHash(tt.args.file, tt.args.merkleProofs)
+			got, err := ReconstructRootHash(tt.args.file, tt.args.merkleProofs, tt.args.fileOrder)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("ReconstructRootHash() error = %v, wantErr %v", err, tt.wantErr)
 
@@ -702,6 +649,7 @@ func TestIsFileCorrect(t *testing.T) {
 		file           *os.File
 		merkleProofs   []string
 		wantedRootHash string
+		fileOrder      int
 	}
 	tests := map[string]struct {
 		args    args
@@ -715,7 +663,8 @@ func TestIsFileCorrect(t *testing.T) {
 					"f8addeff4cc29a9a55589ae001e2230ecd7a515de5be7eeb27da1cabba87fbe6",
 					"dfa84bc707cd740d3551233bfda2cfa6df519d1e7e7174882efa7dc3cdab2286",
 				},
-				wantedRootHash: "5880895435d8c5d8c8b549b520ef550882ab0245e1b241594c44ddffe5a6a8c0",
+				wantedRootHash: hashRoot3Hashes,
+				fileOrder:      0,
 				// FIX:
 				// scenario error 1
 				// sometimes it gets: f814d46d6b2225d6188a8483b3ba7f53f903a911442e4a6eefb6514fd0afa7db
@@ -737,7 +686,8 @@ func TestIsFileCorrect(t *testing.T) {
 					"f9addeff4cc29a9a55589ae001e2230ecd7a515de5be7eeb27da1cabba87fbe6",
 					"dfa84bc707cd740d3551233bfda2cfa6df519d1e7e7174882efa7dc3cdab2286",
 				},
-				wantedRootHash: "5880895435d8c5d8c8b549b520ef550882ab0245e1b241594c44ddffe5a6a8c0",
+				wantedRootHash: hashRoot3Hashes,
+				fileOrder:      0,
 			},
 			false,
 			false,
@@ -745,7 +695,7 @@ func TestIsFileCorrect(t *testing.T) {
 	}
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {
-			got, err := IsFileCorrect(tt.args.file, tt.args.merkleProofs, tt.args.wantedRootHash)
+			got, err := IsFileCorrect(tt.args.file, tt.args.merkleProofs, tt.args.wantedRootHash, tt.args.fileOrder)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("IsFileCorrect() error = %v, wantErr %v", err, tt.wantErr)
 				return

@@ -13,7 +13,7 @@ import (
 // IsFileCorrect if the file is correct and is not tampered.
 // Returns true if the file is not tampered
 // Returns false if the file is tampered
-func IsFileCorrect(file *os.File, merkleProofs []string, wantedRootHash string) (bool, error) {
+func IsFileCorrect(file *os.File, merkleProofs []string, wantedRootHash string, fileOrder int) (bool, error) {
 	h := sha256.New()
 	if _, err := io.Copy(h, file); err != nil {
 		log.Fatal(err)
@@ -21,15 +21,16 @@ func IsFileCorrect(file *os.File, merkleProofs []string, wantedRootHash string) 
 	}
 
 	hashFile := fmt.Sprintf("%x", h.Sum(nil))
-	return isHashFileCorrect(hashFile, merkleProofs, wantedRootHash), nil
+	return isHashFileCorrect(hashFile, merkleProofs, wantedRootHash, fileOrder), nil
 }
 
-func isHashFileCorrect(hashFile string, merkleProofs []string, wantedRootHash string) bool {
-	reconstructedRootHash := reconstructRootHash(hashFile, merkleProofs)
+func isHashFileCorrect(hashFile string, merkleProofs []string, wantedRootHash string, fileOrder int) bool {
+	// nodePositions := getNodesPositions(fileOrder, numberOfLeaves)
+	reconstructedRootHash := reconstructRootHash(hashFile, merkleProofs, fileOrder)
 	return reconstructedRootHash == wantedRootHash
 }
 
-func ReconstructRootHash(file *os.File, merkleProofs []string) (string, error) {
+func ReconstructRootHash(file *os.File, merkleProofs []string, fileOrder int) (string, error) {
 	h := sha256.New()
 	if _, err := io.Copy(h, file); err != nil {
 		log.Fatal(err)
@@ -37,7 +38,9 @@ func ReconstructRootHash(file *os.File, merkleProofs []string) (string, error) {
 	}
 
 	hashFile := fmt.Sprintf("%x", h.Sum(nil))
-	return reconstructRootHash(hashFile, merkleProofs), nil
+	// TODO: call getNodesPositions
+	// nodePositions := getNodesPositions(fileOrder, numberOfLeaves)
+	return reconstructRootHash(hashFile, merkleProofs, fileOrder), nil
 }
 
 // Reconstruct the root hash given the sha256 hash of the file to check and the
@@ -45,33 +48,38 @@ func ReconstructRootHash(file *os.File, merkleProofs []string) (string, error) {
 // 1. hash of the file you want to check integrity (sha256)
 // 2. merkleProofs needed to reconstruct the root hash
 // will return the root hash
-func reconstructRootHash(hashFile string, merkleProofs []string) string {
+func reconstructRootHash(hashFile string, merkleProofs []string, fileOrder int) string {
+	pair := ""
 	rootHash := ""
 	hash := hashFile
+	filePosition := 0
 	for k, mp := range merkleProofs {
 		mp = strings.TrimSpace(mp)
 		fmt.Printf("hash %v: %s\n", k, hash)
 		fmt.Printf("mp %v: %s\n", k, mp)
-		pair := calculateHashPair(hash, mp)
+
+		filePosition = fileOrder % 2
+
+		// 0: file is left of proof
+		if filePosition == 0 {
+			pair = fmt.Sprintf("%s%s", hash, mp)
+		}
+		// 1: file is right of proof
+		if filePosition == 1 {
+			pair = fmt.Sprintf("%s%s", mp, hash)
+		}
+
 		fmt.Printf("pair client %v: %s\n", k, pair)
 		h := sha256.New()
 		h.Write([]byte(pair))
 		nextHash := fmt.Sprintf("%x", h.Sum(nil))
 		hash = nextHash
+
+		fileOrder = fileOrder / 2
 	}
 	fmt.Printf("root hash: %s\n", hash)
 	rootHash = hash
 	return rootHash
-}
-
-func calculateHashPair(h1 string, h2 string) string {
-	pair := ""
-	if h1 > h2 {
-		pair = fmt.Sprintf("%s%s", h1, h2)
-	} else {
-		pair = fmt.Sprintf("%s%s", h2, h1)
-	}
-	return pair
 }
 
 func ComputeMerkleProof(file *os.File, merkleTree [][]string) []string {
@@ -168,7 +176,7 @@ func createMerkleTree(hashLeaves []string) [][]string {
 			fmt.Printf("hash i: %v, j: %v = %s\n", i, j, merkleTree[i][j])
 			fmt.Printf("hash i: %v, j: %v = %s\n", i, j+1, merkleTree[i][j+1])
 
-			pair := calculateHashPair(merkleTree[i][j], merkleTree[i][j+1])
+			pair := fmt.Sprintf("%s%s", merkleTree[i][j], merkleTree[i][j+1])
 			fmt.Printf("pair %v: %s\n", j/2, pair)
 			h := sha256.New()
 			h.Write([]byte(pair))
