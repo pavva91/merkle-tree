@@ -5,9 +5,7 @@ import (
 	"github.com/pavva91/merkle-tree/server/internal/handlers"
 )
 
-var (
-	Router *mux.Router
-)
+var Router *mux.Router
 
 func NewRouter() {
 	Router = mux.NewRouter()

@@ -13,9 +13,7 @@ import (
 	"github.com/pavva91/merkle-tree/server/config"
 )
 
-var (
-	File Filer = file{}
-)
+var File Filer = file{}
 
 type Filer interface {
 	ResetUploadDir() error
@@ -42,7 +40,7 @@ func (s file) SaveBulk(files []*multipart.FileHeader) error {
 	for k, fileHeader := range files {
 		if fileHeader.Size > int64(config.Values.Server.MaxUploadFileSize) {
 			sizeMB := (config.Values.Server.MaxUploadFileSize / 1024) / 1024
-			err := fmt.Errorf("The uploaded file is too big: %s. Please use a file less than %vMB in size", fileHeader.Filename, sizeMB)
+			err := fmt.Errorf("the uploaded file is too big: %s. please use a file less than %vmb in size", fileHeader.Filename, sizeMB)
 			return err
 		}
 

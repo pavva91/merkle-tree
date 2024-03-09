@@ -9,7 +9,6 @@ import (
 )
 
 func main() {
-
 	viper.AutomaticEnv()
 	viper.SetDefault("DEFAULT_STORAGE_FOLDER", "./storage")
 	viper.SetDefault("DEFAULT_UPLOAD_FOLDER", "./testfiles")

@@ -24,7 +24,7 @@ var uploadCmd = &cobra.Command{
 	Short: "Bulk Upload all files in a folder",
 	Long: `Bulk upload all files inside a folder passed as input. 
 	The function will also calculate the merkle tree of the files and store the "root-hash" of the merkle tree`,
-	Run: func(cmd *cobra.Command, args []string) {
+	Run: func(cmd *cobra.Command, _ []string) {
 		uploadFolder := viper.GetString("DEFAULT_UPLOAD_FOLDER")
 		userUploadFolder, _ := cmd.Flags().GetString("dir")
 		if userUploadFolder != "" {
@@ -124,7 +124,6 @@ var uploadCmd = &cobra.Command{
 
 		client := &http.Client{}
 		req, err := http.NewRequest(method, url, payload)
-
 		if err != nil {
 			fmt.Println(err)
 			return
@@ -155,7 +154,7 @@ var uploadCmd = &cobra.Command{
 		}
 
 		rootHashPath := fmt.Sprintf("%s/%s", storageFolder, "root-hash")
-		err = os.WriteFile(rootHashPath, []byte(rootHash), 0666)
+		err = os.WriteFile(rootHashPath, []byte(rootHash), 0o600)
 		if err != nil {
 			fmt.Println(err)
 			return

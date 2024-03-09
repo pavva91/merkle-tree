@@ -9,6 +9,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 
 	"github.com/pavva91/merkle-tree/client/internal/utils"
@@ -23,13 +24,25 @@ var getCmd = &cobra.Command{
 	Short: "Get a file and check its validity",
 	Long:  `Get a file and check its validity with previously created and stored merkle tree.`,
 	Run: func(cmd *cobra.Command, args []string) {
+		fileOrderStr, _ := cmd.Flags().GetString("order")
+		if fileOrderStr == "unassigned" {
+			fmt.Printf("insert the file order, starting from one")
+			return
+		}
+		fileOrder, err := strconv.Atoi(fileOrderStr)
+		if err != nil {
+			fmt.Printf("file order must be an integer")
+			return
+		}
+		fileOrder -= 1
+
 		downloadFolder := viper.GetString("DEFAULT_DOWNLOAD_FOLDER")
 
 		fileName := ""
 		if len(args) == 1 && args[0] != "" {
 			fileName = args[0]
 		} else {
-			fmt.Printf("insert the file name as only argument")
+			fmt.Printf("insert the file name as only argument, starting from one")
 			return
 		}
 
@@ -86,17 +99,22 @@ var getCmd = &cobra.Command{
 		fmt.Println("Try to get '" + fileName + "' file...")
 
 		// Get the data
-		response, err := http.Get(URL)
+		req, err := http.NewRequest(http.MethodGet, URL, nil)
 		if err != nil {
 			fmt.Println(err)
 		}
-		defer response.Body.Close()
 
-		if response.StatusCode == 200 {
+		res, err := http.DefaultClient.Do(req)
+		if err != nil {
+			fmt.Println(err)
+		}
+
+		defer res.Body.Close()
+
+		if res.StatusCode == 200 {
 
 			// Create the file
 			out, err := os.Create(fmt.Sprintf("%s/%s", downloadFolder, fileName))
-
 			// out, err := os.Create(fileName)
 			if err != nil {
 				fmt.Println(err)
@@ -104,14 +122,16 @@ var getCmd = &cobra.Command{
 			defer out.Close()
 
 			// Writer the body to file
-			_, err = io.Copy(out, response.Body)
+			_, err = io.Copy(out, res.Body)
 			if err != nil {
 				fmt.Println(err)
 			}
 
 			// Get Merkle Proof
-			mp := response.Header.Get("Merkle-Proof")
-			merkleProofs := strings.SplitAfter(strings.Replace(strings.Replace(strings.Replace(mp, "[", "", -1), "]", "", -1), "\"", "", -1), " ")
+			mp := res.Header.Get("Merkle-Proof")
+			// FIX:wrapperFunc: use strings.ReplaceAll method in `strings.Replace(mp, "[", "", -1)` (gocritic)
+			merkleProofs := strings.SplitAfter(strings.ReplaceAll(strings.ReplaceAll(strings.ReplaceAll(mp, "[", ""), "]", ""), "\"", ""), " ")
+
 			for k, v := range merkleProofs {
 				log.Printf("proof %v: %s", k, v)
 			}
@@ -148,7 +168,7 @@ var getCmd = &cobra.Command{
 			fmt.Println("root hash retrieved:", rootHash)
 
 			// Verify file with merkle tree (library)
-			reconstructedRootHash, err := merkletree.ReconstructRootHash(file1, merkleProofs)
+			reconstructedRootHash, err := merkletree.ReconstructRootHash(file1, merkleProofs, fileOrder)
 			if err != nil {
 				fmt.Println(err)
 				return
@@ -157,7 +177,7 @@ var getCmd = &cobra.Command{
 			fmt.Println("wanted root hash:", rootHash)
 			fmt.Println("reconstructed root hash:", reconstructedRootHash)
 
-			isFileCorrect, err := merkletree.IsFileCorrect(file2, merkleProofs, rootHash)
+			isFileCorrect, err := merkletree.IsFileCorrect(file2, merkleProofs, rootHash, fileOrder)
 			if err != nil {
 				fmt.Println(err)
 				return
@@ -189,6 +209,7 @@ func init() {
 
 	// Cobra supports Persistent Flags which will work for this command
 	// and all subcommands, e.g.:
+	getCmd.PersistentFlags().StringP("order", "o", "unassigned", "order of the file inside the merkle tree")
 	getCmd.PersistentFlags().StringP("dir", "d", viper.GetString("DEFAULT_DOWNLOAD_FOLDER"), "output directory path where to store downloaded file")
 	getCmd.PersistentFlags().StringP("store", "s", viper.GetString("DEFAULT_STORAGE_FOLDER"), "directory path where to find stored root-hash")
 

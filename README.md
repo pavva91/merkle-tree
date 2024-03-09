@@ -50,7 +50,7 @@ Check the Swagger API in [http://localhost:8080/swagger/index.html](http://local
 #### 2. Open Client
 
 ```bash
-docker exec -it mt-client bash
+docker attach mt-client
 ```
 
 Then the two actions that the client does:
@@ -83,20 +83,21 @@ mt-client upload -d ~/path/to/folder/to/bulk/upload -s ~/path/to/dir/store/root/
 
 The client downloads an arbitrary file from the server and checks that the file is correct and is not corrupted in any way (in transport, tampered with by the server, etc.).
 
+**_NOTE:_** The client needs the file order in the merkle tree (starting from one for the first file)
 **_NOTE:_** By default the client downloads the file into `./client/downloads`
 
 ```bash
-mt-client get f1
+mt-client get -o 1 f1
 ```
 
 To personalize paths of download and retrieve stored root hash folders:
 
 ```bash
-mt-client get --dir ~/path/to/folder/to/download/file --store ~/path/to/dir/store/root/hash f1
+mt-client get --order 1 --dir ~/path/to/folder/to/download/file --store ~/path/to/dir/store/root/hash f1
 ```
 
 ```bash
-mt-client get -d ~/path/to/folder/to/download/file -s ~/path/to/dir/store/root/hash f1
+mt-client get -o 1 -d ~/path/to/folder/to/download/file -s ~/path/to/dir/store/root/hash f1
 ```
 
 ### Unit Tests

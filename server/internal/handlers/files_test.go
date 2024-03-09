@@ -84,7 +84,7 @@ func Test_filesHandler_BulkUpload(t *testing.T) {
 	stubFileFail2.ResetUploadDirFn = func() error {
 		return nil
 	}
-	stubFileFail2.SaveBulkFn = func(files []*multipart.FileHeader) error {
+	stubFileFail2.SaveBulkFn = func(_ []*multipart.FileHeader) error {
 		return errors.New("stub error file 2")
 	}
 
@@ -92,7 +92,7 @@ func Test_filesHandler_BulkUpload(t *testing.T) {
 	stubFileFail3.ResetUploadDirFn = func() error {
 		return nil
 	}
-	stubFileFail3.SaveBulkFn = func(files []*multipart.FileHeader) error {
+	stubFileFail3.SaveBulkFn = func(_ []*multipart.FileHeader) error {
 		err := fmt.Errorf("The uploaded file is too big: %s. Please use a file less than 2MB in size", "path/to/file/name")
 		return err
 	}
@@ -101,7 +101,7 @@ func Test_filesHandler_BulkUpload(t *testing.T) {
 	stubFileOK.ResetUploadDirFn = func() error {
 		return nil
 	}
-	stubFileOK.SaveBulkFn = func(files []*multipart.FileHeader) error {
+	stubFileOK.SaveBulkFn = func(_ []*multipart.FileHeader) error {
 		return nil
 	}
 
@@ -129,7 +129,7 @@ func Test_filesHandler_BulkUpload(t *testing.T) {
 		stub1            stubs.FileService
 		stub2            stubs.MerkleTreeService
 		wantErr          bool
-		expectedHttpCode int
+		expectedHTTPCode int
 		expectedResBody  string
 	}{
 		"wrong request type": {
@@ -206,8 +206,8 @@ func Test_filesHandler_BulkUpload(t *testing.T) {
 			if (w.Code != 200) != tt.wantErr {
 				t.Errorf("CreateTaskRequest.Validate() error = %v, wantErr %v", w.Code, tt.wantErr)
 			}
-			if w.Code != tt.expectedHttpCode {
-				t.Errorf("CreateTaskRequest.Validate() error = %v, wantErr %v", w.Code, tt.expectedHttpCode)
+			if w.Code != tt.expectedHTTPCode {
+				t.Errorf("CreateTaskRequest.Validate() error = %v, wantErr %v", w.Code, tt.expectedHTTPCode)
 			}
 			if w.Body.String() != tt.expectedResBody {
 				t.Errorf("handler returned unexpected body: got %v want %v",
@@ -227,7 +227,7 @@ func Test_filesHandler_DownloadByName(t *testing.T) {
 	stubMTfail2.IsValidFn = func() bool {
 		return true
 	}
-	stubMTfail2.CreateMerkleProofFn = func(s string) ([]string, error) {
+	stubMTfail2.CreateMerkleProofFn = func(_ string) ([]string, error) {
 		return []string{}, errors.New("stub merkle tree error 1")
 	}
 
@@ -235,22 +235,22 @@ func Test_filesHandler_DownloadByName(t *testing.T) {
 	stubMTOK.IsValidFn = func() bool {
 		return true
 	}
-	stubMTOK.CreateMerkleProofFn = func(s string) ([]string, error) {
+	stubMTOK.CreateMerkleProofFn = func(_ string) ([]string, error) {
 		return []string{}, nil
 	}
 
 	stubFileFail1 := stubs.FileService{}
-	stubFileFail1.GetByNameFn = func(filename string) ([]byte, string, error) {
+	stubFileFail1.GetByNameFn = func(_ string) ([]byte, string, error) {
 		return []byte{}, "", errors.New("stub error file 1")
 	}
 
 	stubFileFail2 := stubs.FileService{}
-	stubFileFail2.GetByNameFn = func(filename string) ([]byte, string, error) {
+	stubFileFail2.GetByNameFn = func(_ string) ([]byte, string, error) {
 		return []byte{}, "", errors.New("file not found")
 	}
 
 	stubFileOK := stubs.FileService{}
-	stubFileOK.GetByNameFn = func(filename string) ([]byte, string, error) {
+	stubFileOK.GetByNameFn = func(_ string) ([]byte, string, error) {
 		return []byte{}, "", nil
 	}
 
@@ -262,10 +262,10 @@ func Test_filesHandler_DownloadByName(t *testing.T) {
 		stub1            stubs.MerkleTreeService
 		stub2            stubs.FileService
 		wantErr          bool
-		expectedHttpCode int
+		expectedHTTPCode int
 		expectedResBody  string
 	}{
-		"not initalized merkle tree": {
+		"not initialized merkle tree": {
 			args{
 				vars: map[string]string{
 					"filename": "",
@@ -346,20 +346,18 @@ func Test_filesHandler_DownloadByName(t *testing.T) {
 			if (w.Code != 200) != tt.wantErr {
 				t.Errorf("CreateTaskRequest.Validate() error = %v, wantErr %v", w.Code, tt.wantErr)
 			}
-			if w.Code != tt.expectedHttpCode {
-				t.Errorf("CreateTaskRequest.Validate() error = %v, wantErr %v", w.Code, tt.expectedHttpCode)
+			if w.Code != tt.expectedHTTPCode {
+				t.Errorf("CreateTaskRequest.Validate() error = %v, wantErr %v", w.Code, tt.expectedHTTPCode)
 			}
 			if w.Body.String() != tt.expectedResBody {
 				t.Errorf("handler returned unexpected body: got %v want %v",
 					w.Body.String(), tt.expectedResBody)
 			}
-
 		})
 	}
 }
 
 func Test_filesHandler_ListNames(t *testing.T) {
-
 	stubMTfail1 := stubs.MerkleTreeService{}
 	stubMTfail1.IsValidFn = func() bool {
 		return false
@@ -389,10 +387,10 @@ func Test_filesHandler_ListNames(t *testing.T) {
 		stub1            stubs.MerkleTreeService
 		stub2            stubs.FileService
 		wantErr          bool
-		expectedHttpCode int
+		expectedHTTPCode int
 		expectedResBody  string
 	}{
-		"not initalized merkle tree": {
+		"not initialized merkle tree": {
 			stubMTfail1,
 			stubs.FileService{},
 			true,
@@ -439,8 +437,8 @@ func Test_filesHandler_ListNames(t *testing.T) {
 			if (w.Code != 200) != tt.wantErr {
 				t.Errorf("CreateTaskRequest.Validate() error = %v, wantErr %v", w.Code, tt.wantErr)
 			}
-			if w.Code != tt.expectedHttpCode {
-				t.Errorf("CreateTaskRequest.Validate() error = %v, wantErr %v", w.Code, tt.expectedHttpCode)
+			if w.Code != tt.expectedHTTPCode {
+				t.Errorf("CreateTaskRequest.Validate() error = %v, wantErr %v", w.Code, tt.expectedHTTPCode)
 			}
 			if w.Body.String() != tt.expectedResBody {
 				t.Errorf("handler returned unexpected body: got %v want %v",

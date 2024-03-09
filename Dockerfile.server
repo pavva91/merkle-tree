@@ -1,4 +1,5 @@
-FROM golang:1.22
+# build stage
+FROM golang:1.22-alpine as build
 
 WORKDIR /usr/src/app
 
@@ -9,8 +10,20 @@ WORKDIR /usr/src/app/server
 
 RUN go mod download && go mod verify
 
-RUN go build -v -o /usr/local/bin/app ./main.go
+# RUN go build -v -o /usr/local/bin/app ./main.go
+RUN go build -v -o /mt-server ./main.go
 
-EXPOSE 8080
+# runtime stage
+FROM alpine
 
-CMD ["app"]
+WORKDIR /usr/local/bin
+
+COPY --from=build /mt-server .
+
+WORKDIR /usr/src/app
+
+COPY ./server/testfiles/ ./testfiles/
+
+WORKDIR /usr/src/app/server
+
+CMD ["mt-server"]

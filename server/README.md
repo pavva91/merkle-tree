@@ -19,3 +19,17 @@ curl -v -X GET 'http://localhost:8080/files/f1' -o tmp.out
 ```bash
 curl -v -X GET 'http://localhost:8080/files'
 ```
+
+## Linter
+
+### Run
+
+```bash
+golangci-lint run
+```
+
+### Fix
+
+```bash
+golangci-lint run --fix
+```

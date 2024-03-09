@@ -16,9 +16,7 @@ import (
 
 type filesHandler struct{}
 
-var (
-	FilesHandler = filesHandler{}
-)
+var FilesHandler = filesHandler{}
 
 // Bulk Upload godoc
 //
@@ -78,7 +76,6 @@ func (h filesHandler) BulkUpload(w http.ResponseWriter, r *http.Request) {
 //	@Failure		500			{object}	string
 //	@Router			/files/{filename} [get]
 func (h filesHandler) DownloadByName(w http.ResponseWriter, r *http.Request) {
-
 	if !services.MerkleTree.IsValid() {
 		err := errors.New("no merkle tree, upload files first")
 		log.Println(err.Error())
@@ -128,7 +125,7 @@ func (h filesHandler) DownloadByName(w http.ResponseWriter, r *http.Request) {
 //	@Failure		404	{object}	string
 //	@Failure		500	{object}	string
 //	@Router			/files [get]
-func (h filesHandler) ListNames(w http.ResponseWriter, r *http.Request) {
+func (h filesHandler) ListNames(w http.ResponseWriter, _ *http.Request) {
 	if !services.MerkleTree.IsValid() {
 		err := errors.New("no merkle tree, upload files first")
 		log.Println(err.Error())
