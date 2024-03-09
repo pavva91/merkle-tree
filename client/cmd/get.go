@@ -34,7 +34,7 @@ var getCmd = &cobra.Command{
 			fmt.Printf("file order must be an integer")
 			return
 		}
-		fileOrder -= 1
+		fileOrder--
 
 		downloadFolder := viper.GetString("DEFAULT_DOWNLOAD_FOLDER")
 

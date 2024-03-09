@@ -75,7 +75,7 @@ func reconstructRootHash(hashFile string, merkleProofs []string, fileOrder int) 
 		nextHash := fmt.Sprintf("%x", h.Sum(nil))
 		hash = nextHash
 
-		fileOrder = fileOrder / 2
+		fileOrder /= 2
 	}
 	fmt.Printf("root hash: %s\n", hash)
 	rootHash = hash

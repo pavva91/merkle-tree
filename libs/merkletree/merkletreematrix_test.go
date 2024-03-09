@@ -17,6 +17,7 @@ var (
 	mu3  sync.Mutex
 	mu10 sync.Mutex
 )
+
 var merkleTree3HashesM = [][]string{
 	{"0dffefeae189629164f222e18c83883c1fd9b5b02eb55d5ca99bd207ebcf882d", "f8addeff4cc29a9a55589ae001e2230ecd7a515de5be7eeb27da1cabba87fbe6", "34575cdd0f12f999e0fc36ef7d70bbd5d302b9bca1a24a0712f505f490cf7a52", "34575cdd0f12f999e0fc36ef7d70bbd5d302b9bca1a24a0712f505f490cf7a52"},
 	{"e2abf2fd16b981a59d8ecf4a9a0ac0498c715e45801e29f0152cefad8c6f87f4", "dfa84bc707cd740d3551233bfda2cfa6df519d1e7e7174882efa7dc3cdab2286"},
@@ -554,10 +555,9 @@ func TestReconstructRootHash_3files(t *testing.T) {
 	}
 
 	type args struct {
-		file           *os.File
-		merkleProofs   []string
-		fileOrder      int
-		numberOfLeaves int
+		file         *os.File
+		merkleProofs []string
+		fileOrder    int
 	}
 	tests := map[string]struct {
 		args    args
