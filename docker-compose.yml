@@ -4,7 +4,7 @@ services:
       context: .
       dockerfile: ./Dockerfile.server
     env_file: .env
-    container_name: merkle-tree-file-server
+    container_name: bike-server
     labels:
       kompose.service.type: LoadBalancer
     environment:
@@ -18,13 +18,28 @@ services:
     ports:
       - "${PORT}:${PORT}"
       - 8080:8080
+    depends_on:
+      - db
+  db:
+    image: postgres:16.2-alpine3.19
+    env_file: .env
+    container_name: bike-db
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=bike
+    ports:
+      - 5432:5432
+
+    volumes:
+      - ./data/db:/var/lib/postgres/data
   client:
     depends_on:
       - server
     build: 
       context: .
       dockerfile: ./Dockerfile.client
-    container_name: mt-client
+    container_name: bike-client
     stdin_open: true
     tty: true
     environment:
@@ -33,5 +48,4 @@ services:
       - DEFAULT_UPLOAD_FOLDER=./testfiles
       # - SERVER_URL=http://172.17.0.1:${PORT}
       # - SERVER_URL=http://172.17.0.1:8080
-      - SERVER_URL=http://merkle-tree-file-server:8080
-version: "3.8"
+      - SERVER_URL=http://bike-server:8080
